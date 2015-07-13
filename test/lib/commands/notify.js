@@ -14,7 +14,8 @@ describe('lib/commands/notify', function () {
     resolveLocation = sinon.stub()
     cache = {
       get: sinon.stub(),
-      set: sinon.stub()
+      set: sinon.stub(),
+      drop: sinon.stub()
     }
 
     notify = proxyquire('../../../lib/commands/notify', {
@@ -134,10 +135,35 @@ describe('lib/commands/notify', function () {
     var location = 'location'
 
     resolveLocation.callsArgWith(1, null, location)
-    cache.set.callsArg(3)
+    cache.drop.callsArg(1)
 
     notify(ssdp, message)
 
+    expect(ssdp.emit.calledWith(message.headers.NTS)).to.be.true
+    expect(resolveLocation.called).to.be.false
+  })
+
+  it('should emit error when dropping service that is going away fails', function () {
+    var ssdp = {
+      emit: sinon.stub()
+    }
+    var message = {
+      headers: {
+        LOCATION: 'location',
+        USN: 'usn',
+        NT: 'nt',
+        NTS: 'ssdp:byebye'
+      }
+    }
+    var location = 'location'
+    var error = new Error('Urk!')
+
+    resolveLocation.callsArgWith(1, null, location)
+    cache.drop.callsArgWith(1, error)
+
+    notify(ssdp, message)
+
+    expect(ssdp.emit.calledWith('error', error)).to.be.true
     expect(ssdp.emit.calledWith(message.headers.NTS)).to.be.true
     expect(resolveLocation.called).to.be.false
   })

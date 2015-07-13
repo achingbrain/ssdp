@@ -64,4 +64,22 @@ describe('lib/cache', function () {
       })
     })
   })
+
+  it('should drop a thing from the store', function (done) {
+    cache.set('foo', 'bar', 100, function () {
+      cache.get('foo', function (error, result) {
+        expect(error).to.not.exist
+        expect(result).to.equal('bar')
+        cache.drop('foo', function (error) {
+          expect(error).to.not.exist
+
+          cache.get('foo', function (error, result) {
+            expect(error).to.not.exist
+            expect(result).to.not.exist
+            done()
+          })
+        })
+      })
+    })
+  })
 })

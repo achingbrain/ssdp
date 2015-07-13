@@ -76,7 +76,6 @@ describe('lib/commands/notify', function () {
     Wreck.get.withArgs(location).callsArgWith(2, null, result, payload)
 
     resolveLocation(location, function (error, location) {
-      console.info('error', error)
       expect(error.message).to.contain('Bad content type')
       done()
     })
