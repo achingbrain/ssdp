@@ -4,7 +4,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/achingbrain/node-ssdp.svg)](https://coveralls.io/r/achingbrain/ssdp?branch=master)
 [![Dependency Status](https://david-dm.org/achingbrain/node-ssdp.png)](https://david-dm.org/achingbrain/ssdp)
 
-An implementation of SSDP for node, largely inspired by [diversario/node-ssdp](https://github.com/diversario/node-ssdp) but without the wrinkles and extra logging library.
+An implementation of the Simple Service Discovery protocol for node.
 
 ## Installation
 
@@ -85,7 +85,8 @@ var ssdp = require('@achingbrain/ssdp')
 // all arguments are optional
 var bus = ssdp({
   udn: 'unique-identifier', // defaults to a random UUID
-  signature: 'node.js/0.12.6 UPnP/1.1 @achingbrain/ssdp/1.0.0', // a string to identify the server by
+  // a string to identify the server by
+  signature: 'node.js/0.12.6 UPnP/1.1 @achingbrain/ssdp/1.0.0',
   retry {
     times: 5, // how many times to attempt joining the UDP multicast group
     interval: 5000 // how long to wait between attempts
@@ -128,8 +129,11 @@ bus.advertise({
   ipv4: true, // whether or not to broadcast the advert over IPv4
   ipv6: true, // whether or not to broadcast the advert over IPv6
   location: null, // a string location or leave out to have it auto-generated
+  // if location is null, specify a function that passes a description object to the callback
   details: function (callback) {
-    callback(null, {}) // if location is null, specify a function that passes an object to the callback
+    callback(null, {
+      // ...
+    })
   }
 }, function (error, advert) {
   // stop advertising a service
@@ -213,3 +217,8 @@ bus.advertise({
 A random high port will be chosen, a http server will listen on that port and serve the descriptor and the `LOCATION` header will be set appropriately in all `ssdp` messages.
 
 The server will be shut down when you call `advert.stop`.
+
+## References
+
+ * [diversario/node-ssdp](https://github.com/diversario/node-ssdp)
+ * [Xedecimal/node-ssdp](https://www.npmjs.com/package/ssdp) (no longer maintained)
