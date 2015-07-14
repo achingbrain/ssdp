@@ -1,45 +1,31 @@
 var describe = require('mocha').describe
 var it = require('mocha').it
-var beforeEach = require('mocha').beforeEach
 var expect = require('chai').expect
 var sinon = require('sinon')
-var proxyquire = require('proxyquire')
+var discover = require('../../../lib/discover')
 
 describe('lib/discover', function () {
-  var discover
-  var sendSsdpMessage
-
-  beforeEach(function () {
-    sendSsdpMessage = sinon.stub()
-
-    discover = proxyquire('../../../lib/discover', {
-      '../send-ssdp-message': sendSsdpMessage
-    })
-  })
 
   it('should send a search message', function (done) {
-    var ssdp = {}
-    var sockets = []
-    var serviceType = 'serviceType'
-    var socket = {
-      opts: {
-        broadcast: {
+    var ssdp = {
+      sockets: [{
+        options: {
+          broadcast: {
 
+          },
+          bind: {
+
+          }
         },
-        bind: {
-
-        }
-      }
+        send: sinon.stub().callsArg(5)
+      }]
     }
+    var serviceType = 'serviceType'
 
-    discover(ssdp, sockets, serviceType)
-
-    expect(sendSsdpMessage.called).to.be.true
-    expect(sendSsdpMessage.getCall(0).args[3]).to.be.a('function')
-
-    sendSsdpMessage.getCall(0).args[3](socket, function (error, message) {
+    discover(ssdp, serviceType, function (error) {
       expect(error).to.not.exist
 
+      var message = ssdp.sockets[0].send.getCall(0).args[0]
       message = message.toString('utf8')
 
       expect(message).to.contain('M-SEARCH')
@@ -50,27 +36,24 @@ describe('lib/discover', function () {
   })
 
   it('should default to global search', function (done) {
-    var ssdp = {}
-    var sockets = []
-    var socket = {
-      opts: {
-        broadcast: {
+    var ssdp = {
+      sockets: [{
+        options: {
+          broadcast: {
 
+          },
+          bind: {
+
+          }
         },
-        bind: {
-
-        }
-      }
+        send: sinon.stub().callsArg(5)
+      }]
     }
 
-    discover(ssdp, sockets)
-
-    expect(sendSsdpMessage.called).to.be.true
-    expect(sendSsdpMessage.getCall(0).args[3]).to.be.a('function')
-
-    sendSsdpMessage.getCall(0).args[3](socket, function (error, message) {
+    discover(ssdp, null, function (error) {
       expect(error).to.not.exist
 
+      var message = ssdp.sockets[0].send.getCall(0).args[0]
       message = message.toString('utf8')
 
       expect(message).to.contain('M-SEARCH')

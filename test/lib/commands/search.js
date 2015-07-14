@@ -27,26 +27,18 @@ describe('lib/commands/search', function () {
       }
     }
 
-    search({}, null, null, message)
-
-    expect(sendSsdpMessage.called).to.be.false
-
-    message.headers.MAN = 'man'
-
-    search({}, null, null, message)
-
-    expect(sendSsdpMessage.called).to.be.false
-
-    message.headers.MX = 'mx'
-
-    search({}, null, null, message)
+    search({}, message)
 
     expect(sendSsdpMessage.called).to.be.false
   })
 
   it('should respond to global search', function (done) {
-    var sockets = 'sockets'
-    var udn = 'udn'
+    var ssdp = {
+      udn: 'udn',
+      sockets: [{
+        type: 'udp4'
+      }]
+    }
     var message = {
       headers: {
         MAN: 'man',
@@ -58,32 +50,36 @@ describe('lib/commands/search', function () {
       service: {
         usn: 'usn',
         ttl: 1800,
-        location: 'location'
+        location: {
+          udp4: 'location'
+        }
       }
     }
 
     adverts.push(advert)
 
-    sendSsdpMessage.callsArgWith(3, 'socket', function (error, message) {
+    sendSsdpMessage.callsArgWith(2, ssdp.sockets[0], function (error, message) {
       expect(error).to.not.exist
 
       message = message.toString('utf8')
 
       expect(message).to.contain(advert.service.usn)
-      expect(message).to.contain(advert.service.usn + '::' + udn)
-      expect(message).to.contain(advert.service.location)
+      expect(message).to.contain(advert.service.usn + '::' + ssdp.udn)
+      expect(message).to.contain(advert.service.location.udp4)
 
       done()
     })
 
-    search({}, sockets, udn, message)
+    search(ssdp, message)
 
     expect(sendSsdpMessage.called).to.be.true
   })
 
   it('should respond to global search', function () {
-    var sockets = 'sockets'
-    var udn = 'udn'
+    var ssdp = {
+      udn: 'udn',
+      sockets: 'sockets'
+    }
     var message = {
       headers: {
         MAN: 'man',
@@ -102,7 +98,7 @@ describe('lib/commands/search', function () {
       }
     })
 
-    search({}, sockets, udn, message)
+    search(ssdp, message)
 
     expect(sendSsdpMessage.calledOnce).to.be.true
   })

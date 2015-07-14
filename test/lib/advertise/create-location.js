@@ -24,32 +24,32 @@ describe('lib/advertise/create-location', function () {
   })
 
   it('should create location', function (done) {
-    var shutDownServers = []
-    var options = {}
-    var socket = {
-      type: 'udp4'
+    var ssdp = {
+      sockets: [{
+        type: 'udp4'
+      }]
     }
-    var headers = {}
-    var iface = {
+    var advert = {}
+    var ifaces = [{
       address: 'address'
-    }
+    }]
     var server = {
       listen: sinon.stub().callsArgWithAsync(2),
       close: sinon.stub()
     }
 
-    findAllInterfaces.withArgs(true, false).returns([iface])
+    findAllInterfaces.withArgs(true, false).returns(ifaces)
     freeport.callsArgWithAsync(0, null, 'port')
     http.createServer = sinon.stub().withArgs(sinon.match.func).returns(server)
 
-    createLocation(shutDownServers, options, socket, headers, function (error) {
+    createLocation(ssdp, advert, function (error) {
       expect(error).to.not.exist
-      expect(options.location).to.be.ok
-      expect(options.location).to.contain(iface.address)
-      expect(shutDownServers.length).to.equal(1)
-      expect(shutDownServers[0]).to.be.a('function')
+      expect(advert.location).to.be.ok
+      expect(advert.location[ssdp.sockets[0].type]).to.contain(ifaces[0].address)
+      expect(advert.shutDownServers.length).to.equal(1)
+      expect(advert.shutDownServers[0]).to.be.a('function')
       expect(server.close.called).to.be.false
-      shutDownServers[0]()
+      advert.shutDownServers[0]()
       expect(server.close.called).to.be.true
 
       done()
@@ -57,45 +57,45 @@ describe('lib/advertise/create-location', function () {
   })
 
   it('should create ipv6 location', function (done) {
-    var shutDownServers = []
-    var options = {}
-    var socket = {
-      type: 'udp6'
+    var ssdp = {
+      sockets: [{
+        type: 'udp6'
+      }]
     }
-    var headers = {}
-    var iface = {
+    var advert = {}
+    var ifaces = [{
       address: 'address'
-    }
+    }]
     var server = {
-      listen: sinon.stub().callsArgWithAsync(2)
+      listen: sinon.stub().callsArgWithAsync(2),
+      close: sinon.stub()
     }
 
-    findAllInterfaces.withArgs(false, true).returns([iface])
+    findAllInterfaces.withArgs(false, true).returns(ifaces)
     freeport.callsArgWithAsync(0, null, 'port')
     http.createServer = sinon.stub().withArgs(sinon.match.func).returns(server)
 
-    createLocation(shutDownServers, options, socket, headers, function (error) {
+    createLocation(ssdp, advert, function (error) {
       expect(error).to.not.exist
-      expect(options.location).to.be.ok
-      expect(options.location).to.contain('[' + iface.address + ']')
-      expect(shutDownServers.length).to.equal(1)
-      expect(shutDownServers[0]).to.be.a('function')
+      expect(advert.location).to.be.ok
+      expect(advert.location[ssdp.sockets[0].type]).to.contain(ifaces[0].address)
+      expect(advert.shutDownServers.length).to.equal(1)
+      expect(advert.shutDownServers[0]).to.be.a('function')
+      expect(server.close.called).to.be.false
+      advert.shutDownServers[0]()
+      expect(server.close.called).to.be.true
 
       done()
     })
   })
 
   it('should use existing location', function (done) {
-    var options = {
+    var advert = {
       location: 'location'
     }
-    var headers = {
 
-    }
-
-    createLocation(null, options, null, headers, function (error) {
+    createLocation(null, advert, function (error) {
       expect(error).to.not.exist
-      expect(headers.LOCATION).to.equal(options.location)
       expect(findAllInterfaces.called).to.be.false
 
       done()
@@ -103,21 +103,21 @@ describe('lib/advertise/create-location', function () {
   })
 
   it('should return error when finding port', function (done) {
-    var shutDownServers = []
-    var options = {}
-    var socket = {
-      type: 'udp4'
+    var ssdp = {
+      sockets: [{
+        type: 'udp4'
+      }]
     }
-    var headers = {}
-    var iface = {
+    var advert = {}
+    var ifaces = [{
       address: 'address'
-    }
+    }]
     var error = new Error('Urk!')
 
-    findAllInterfaces.withArgs(true, false).returns([iface])
+    findAllInterfaces.withArgs(true, false).returns(ifaces)
     freeport.callsArgWithAsync(0, error)
 
-    createLocation(shutDownServers, options, socket, headers, function (err) {
+    createLocation(ssdp, advert, function (err) {
       expect(err).to.equal(error)
 
       done()

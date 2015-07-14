@@ -12,10 +12,17 @@ describe('lib/advertise/parse-options', function () {
     expect(options.interval).to.equal(10000)
   })
 
-  it('should survive empty object', function () {
+  it('should survive empty object', function (done) {
     var options = parseOptions()
 
     expect(options.usn).to.equal('a-usn')
     expect(options.interval).to.equal(10000)
+    expect(options.details).to.be.a('function')
+
+    options.details(function (error, detail) {
+      expect(error).to.not.exist
+      expect(detail).to.be.an('object')
+      done()
+    })
   })
 })

@@ -43,7 +43,7 @@ describe('lib', function () {
 
     process.nextTick(function () {
       expect(createSockets.called).to.be.true
-      createSockets.getCall(0).args[2]()
+      createSockets.getCall(0).args[1]()
 
       ssdp.emit('ready')
 
@@ -62,7 +62,7 @@ describe('lib', function () {
     })
     process.nextTick(function () {
       expect(createSockets.called).to.be.true
-      createSockets.getCall(0).args[2](error)
+      createSockets.getCall(0).args[1](error)
     })
   })
 
@@ -76,7 +76,7 @@ describe('lib', function () {
 
     process.nextTick(function () {
       expect(createSockets.called).to.be.true
-      createSockets.getCall(0).args[2](error)
+      createSockets.getCall(0).args[1](error)
     })
   })
 
@@ -104,7 +104,7 @@ describe('lib', function () {
 
     process.nextTick(function () {
       expect(createSockets.called).to.be.true
-      createSockets.getCall(0).args[2](null, sockets)
+      createSockets.getCall(0).args[1](null, sockets)
 
       ssdp.stop(function (error) {
         expect(error).to.not.exist

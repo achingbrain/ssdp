@@ -21,28 +21,29 @@ describe('lib/create-sockets', function () {
 
   it('should create sockets', function (done) {
     var ssdp = {
-      emit: sinon.stub()
-    }
-    var options = {
-      udp4: {
-        broadcast: {
+      emit: sinon.stub(),
+      options: {
+        sockets: [{
+          type: 'udp4',
+          broadcast: {
 
-        },
-        bind: {
+          },
+          bind: {
 
+          }
+        }, {
+          type: 'udp6',
+          broadcast: {
+
+          },
+          bind: {
+
+          }
+        }],
+        retry: {
+          times: 5,
+          interval: 5000
         }
-      },
-      udp6: {
-        broadcast: {
-
-        },
-        bind: {
-
-        }
-      },
-      retry: {
-        times: 5,
-        interval: 5000
       }
     }
     var socket4 = {
@@ -65,7 +66,7 @@ describe('lib/create-sockets', function () {
     dgram.createSocket.withArgs('udp4').returns(socket4)
     dgram.createSocket.withArgs('udp6').returns(socket6)
 
-    createSockets(ssdp, options, function (error, sockets) {
+    createSockets(ssdp, function (error, sockets) {
       expect(error).to.not.exist
       expect(sockets.length).to.equal(2)
       expect(sockets[0]).to.equal(socket4)
@@ -84,23 +85,24 @@ describe('lib/create-sockets', function () {
 
   it('should create only udp4 sockets', function (done) {
     var ssdp = {
-      emit: sinon.stub()
-    }
-    var options = {
-      udp4: {
-        broadcast: {
+      emit: sinon.stub(),
+      options: {
+        sockets: [{
+          type: 'udp4',
+          broadcast: {
 
-        },
-        bind: {
+          },
+          bind: {
 
+          }
+        }],
+        retry: {
+          times: 5,
+          interval: 5000
         }
-      },
-      udp6: false,
-      retry: {
-        times: 5,
-        interval: 5000
       }
     }
+
     var socket4 = {
       bind: sinon.stub(),
       on: sinon.stub(),
@@ -112,7 +114,7 @@ describe('lib/create-sockets', function () {
 
     dgram.createSocket.withArgs('udp4').returns(socket4)
 
-    createSockets(ssdp, options, function (error, sockets) {
+    createSockets(ssdp, function (error, sockets) {
       expect(error).to.not.exist
       expect(sockets.length).to.equal(1)
       expect(sockets[0]).to.equal(socket4)
@@ -127,23 +129,24 @@ describe('lib/create-sockets', function () {
   it('should pass back error creating membership', function (done) {
     var error = new Error('Urk!')
     var ssdp = {
-      emit: sinon.stub()
-    }
-    var options = {
-      udp4: {
-        broadcast: {
+      emit: sinon.stub(),
+      options: {
+        sockets: [{
+          type: 'udp4',
+          broadcast: {
 
-        },
-        bind: {
+          },
+          bind: {
 
+          }
+        }],
+        retry: {
+          times: 5,
+          interval: 10
         }
-      },
-      udp6: false,
-      retry: {
-        times: 5,
-        interval: 1
       }
     }
+
     var socket4 = {
       bind: sinon.stub(),
       on: sinon.stub(),
@@ -154,7 +157,7 @@ describe('lib/create-sockets', function () {
 
     dgram.createSocket.withArgs('udp4').returns(socket4)
 
-    createSockets(ssdp, options, function (err, sockets) {
+    createSockets(ssdp, function (err, sockets) {
       expect(err).to.equal(error)
       done()
     })

@@ -9,255 +9,97 @@ var adverts = require('../../../lib/adverts')
 
 describe('lib/advertise', function () {
   var advertise
-  var sendSsdpMessage
   var createLocation
+  var broadcastAdvert
+  var stopAdvert
+  var clock
 
   beforeEach(function () {
-    sendSsdpMessage = sinon.stub()
-    createLocation = function (shutDownServers, options, socket, headers, callback) {
-      headers['LOCATION'] = options.location
-      callback(null, headers)
-    }
+    clock = sinon.useFakeTimers()
+    createLocation = sinon.stub()
+    broadcastAdvert = sinon.stub()
+    stopAdvert = sinon.stub()
 
     advertise = proxyquire('../../../lib/advertise', {
-      '../send-ssdp-message': sendSsdpMessage,
-      './create-location': createLocation
+      './broadcast-advert': broadcastAdvert,
+      './create-location': createLocation,
+      './stop-advert': stopAdvert
     })
   })
 
   afterEach(function () {
     adverts.splice(0, adverts.length)
+    clock.restore()
   })
 
   it('should advertise a service', function (done) {
-    var sockets = 'sockets'
-    var udn = 'udn'
-    var options = {
-      location: 'location'
-    }
-    var socket = {
-      opts: {
-        broadcast: {
+    createLocation.callsArgAsync(2)
+    broadcastAdvert.callsArgAsync(3)
 
-        }
-      }
+    var ssdp = {}
+    var advert = {
+      usn: 'test-usn'
     }
 
-    var advert = advertise({}, sockets, udn, options)
-
-    expect(sendSsdpMessage.called).to.be.true
-    expect(sendSsdpMessage.getCall(0).args[3]).to.be.a('function')
-
-    sendSsdpMessage.getCall(0).args[3](socket, function (error, message) {
+    advertise(ssdp, advert, function (error, ad) {
       expect(error).to.not.exist
-
-      message = message.toString('utf8')
-
-      expect(message).to.contain(options.location)
-      expect(message).to.contain('NTS: ssdp:alive')
+      expect(ad.service.usn).to.equal(advert.usn)
       expect(adverts.length).to.equal(1)
-      expect(adverts[0]).to.equal(advert)
-      expect(advert.service.detailsHandler).to.be.a('function')
+      expect(adverts[0].service.usn).to.equal(advert.usn)
 
-      advert.service.detailsHandler(function (error, result) {
-        expect(error).to.not.exist
-        expect(result).to.be.an('object')
-
-        done()
-      })
+      done()
     })
   })
 
-  it('should broadcast bye message when shutting down servers', function (done) {
-    var sockets = 'sockets'
-    var udn = 'udn'
-    var options = {
-      location: 'location'
-    }
-    var socket = {
-      opts: {
-        broadcast: {
+  it('should advertise a service repeatedly', function (done) {
+    createLocation.callsArgAsync(2)
+    broadcastAdvert.callsArgAsync(3)
 
-        }
-      }
+    var ssdp = {}
+    var advert = {
+      usn: 'test-usn',
+      interval: 10000
     }
 
-    var advert = advertise({}, sockets, udn, options)
-    advert.stop(function (error) {
+    advertise(ssdp, advert, function (error, ad) {
       expect(error).to.not.exist
 
-      expect(sendSsdpMessage.calledTwice).to.be.true
-      expect(sendSsdpMessage.getCall(1).args[3]).to.be.a('function')
+      expect(broadcastAdvert.callCount).to.equal(2)
 
-      sendSsdpMessage.getCall(1).args[3](socket, function (error, message) {
-        expect(error).to.not.exist
+      clock.tick(advert.interval + 100)
 
-        message = message.toString('utf8')
-
-        expect(message).to.contain(options.location)
-        expect(message).to.contain('NTS: ssdp:byebye')
-        expect(adverts.length).to.equal(0)
-
-        done()
-      })
-    })
-  })
-
-  it('should emit error when broadcasting bye message when shutting down servers fails', function (done) {
-    var sockets = 'sockets'
-    var udn = 'udn'
-    var options = {
-      location: 'location'
-    }
-    var socket = {
-      opts: {
-        broadcast: {
-
-        }
-      }
-    }
-
-    var error = new Error('Urk!')
-
-    createLocation = function (shutDownServers, options, socket, headers, callback) {
-      shutDownServers.push(function (callback) {
-        callback(error)
-      })
-
-      callback(null, headers)
-    }
-
-    sendSsdpMessage = function (ssdp, sockets, remote, createMessage, callback) {
-      createMessage(socket, function () {
-        callback()
-      })
-    }
-
-    advertise = proxyquire('../../../lib/advertise', {
-      '../send-ssdp-message': sendSsdpMessage,
-      './create-location': createLocation
-    })
-
-    var advert = advertise({
-      emit: function (event, err) {
-        expect(event).to.equal('error')
-        expect(err).to.equal(error)
-        done()
-      }
-    }, sockets, udn, options, function () {
-      advert.stop()
-    })
-  })
-
-  it('should not emit error when broadcasting bye message when shutting down servers', function () {
-    var sockets = 'sockets'
-    var udn = 'udn'
-    var options = {
-      location: 'location'
-    }
-    var socket = {
-      opts: {
-        broadcast: {
-
-        }
-      }
-    }
-
-    createLocation = function (shutDownServers, options, socket, headers, callback) {
-      callback(null, headers)
-    }
-
-    sendSsdpMessage = function (ssdp, sockets, remote, createMessage, callback) {
-      createMessage(socket, function () {
-        callback()
-      })
-    }
-
-    advertise = proxyquire('../../../lib/advertise', {
-      '../send-ssdp-message': sendSsdpMessage,
-      './create-location': createLocation
-    })
-
-    var advert = advertise({}, sockets, udn, options, function () {
-      advert.stop()
-    })
-  })
-
-  it('should pass back error creating location', function (done) {
-    var sockets = 'sockets'
-    var udn = 'udn'
-    var options = {
-      location: 'location'
-    }
-    var socket = {
-      opts: {
-        broadcast: {
-
-        }
-      }
-    }
-    var error = new Error('Urk!')
-
-    createLocation = function (shutDownServers, options, socket, headers, callback) {
-      callback(error)
-    }
-
-    advertise = proxyquire('../../../lib/advertise', {
-      '../send-ssdp-message': sendSsdpMessage,
-      './create-location': createLocation
-    })
-
-    advertise({}, sockets, udn, options)
-
-    sendSsdpMessage.getCall(0).args[3](socket, function (err) {
-      expect(err).to.equal(error)
+      expect(broadcastAdvert.callCount).to.equal(3)
 
       done()
     })
   })
 
-  it('should pass back error when sending message fails', function (done) {
-    var sockets = 'sockets'
-    var udn = 'udn'
-    var options = {
-      location: 'location'
-    }
+  it('should fail to advertise a service repeatedly', function (done) {
     var error = new Error('Urk!')
-    sendSsdpMessage.callsArgWith(4, error)
 
-    advertise({}, sockets, udn, options, function (err) {
-      expect(err).to.equal(err)
+    createLocation.callsArgAsync(2)
+    broadcastAdvert.onFirstCall().callsArgAsync(3)
+    broadcastAdvert.onSecondCall().callsArgAsync(3)
+    broadcastAdvert.onThirdCall().callsArgWithAsync(3, error)
+
+    var ssdp = {
+      emit: sinon.stub()
+    }
+    var advert = {
+      usn: 'test-usn',
+      interval: 10000
+    }
+
+    advertise(ssdp, advert, function (err, ad) {
+      expect(err).to.not.exist
+
+      expect(broadcastAdvert.callCount).to.equal(2)
+
+      expect(ssdp.emit.called).to.be.false
+
+      clock.tick(advert.interval + 100)
+
       done()
     })
-  })
-
-  it('should emit error when sending message fails', function (done) {
-    var sockets = 'sockets'
-    var udn = 'udn'
-    var options = {
-      location: 'location'
-    }
-    var error = new Error('Urk!')
-    sendSsdpMessage.callsArgWith(4, error)
-
-    advertise({
-      emit: function (event, err) {
-        expect(event).to.equal('error')
-        expect(err).to.equal(error)
-        done()
-      }
-    }, sockets, udn, options)
-  })
-
-  it('should not emit error when sending message succeeds', function () {
-    var sockets = 'sockets'
-    var udn = 'udn'
-    var options = {
-      location: 'location'
-    }
-
-    sendSsdpMessage.callsArg(4)
-
-    advertise({}, sockets, udn, options)
   })
 })
