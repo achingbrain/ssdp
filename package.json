@@ -40,7 +40,6 @@
   "dependencies": {
     "async": "^1.3.0",
     "freeport": "^1.0.5",
-    "load-once": "^1.0.1",
     "lodash": "^3.10.0",
     "uuid": "^2.0.1",
     "wildemitter": "^1.1.0",
