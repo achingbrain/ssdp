@@ -34,7 +34,6 @@ describe('lib/advertise', function () {
 
   it('should advertise a service', function (done) {
     createLocation.callsArgAsync(2)
-    broadcastAdvert.callsArgAsync(3)
 
     var ssdp = {}
     var advert = {
@@ -51,9 +50,24 @@ describe('lib/advertise', function () {
     })
   })
 
+  it('should fail to advertise a service', function (done) {
+    var error = new Error('Urk!')
+    createLocation.callsArgWithAsync(2, error)
+
+    var ssdp = {}
+    var advert = {
+      usn: 'test-usn'
+    }
+
+    advertise(ssdp, advert, function (err) {
+      expect(err).to.equal(error)
+
+      done()
+    })
+  })
+
   it('should advertise a service repeatedly', function (done) {
     createLocation.callsArgAsync(2)
-    broadcastAdvert.callsArgAsync(3)
 
     var ssdp = {}
     var advert = {
@@ -69,35 +83,6 @@ describe('lib/advertise', function () {
       clock.tick(advert.interval + 100)
 
       expect(broadcastAdvert.callCount).to.equal(3)
-
-      done()
-    })
-  })
-
-  it('should fail to advertise a service repeatedly', function (done) {
-    var error = new Error('Urk!')
-
-    createLocation.callsArgAsync(2)
-    broadcastAdvert.onFirstCall().callsArgAsync(3)
-    broadcastAdvert.onSecondCall().callsArgAsync(3)
-    broadcastAdvert.onThirdCall().callsArgWithAsync(3, error)
-
-    var ssdp = {
-      emit: sinon.stub()
-    }
-    var advert = {
-      usn: 'test-usn',
-      interval: 10000
-    }
-
-    advertise(ssdp, advert, function (err, ad) {
-      expect(err).to.not.exist
-
-      expect(broadcastAdvert.callCount).to.equal(2)
-
-      expect(ssdp.emit.called).to.be.false
-
-      clock.tick(advert.interval + 100)
 
       done()
     })

@@ -5,7 +5,7 @@ var sinon = require('sinon')
 var expect = require('chai').expect
 var proxyquire = require('proxyquire')
 
-describe('lib/commands/notify', function () {
+describe('lib/commands/resolve-service', function () {
   var resolveLocation
   var Wreck
 

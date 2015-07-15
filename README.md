@@ -20,7 +20,7 @@ First, import the module, call the function and set up an error handler:
 var ssdp = require('@achingbrain/ssdp')
 var bus = ssdp()
 
-// print error messages on the console
+// print error messages to the console
 bus.on('error', console.error)
 ```
 
@@ -33,8 +33,13 @@ Pass a `usn` to the `discover` method - when services are found events will be e
 var usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
 
 bus.discover(usn)
-bus.on(usn, function (service) {
+bus.on('discover:' + usn, function (service) {
   // receive a notification about a service
+
+  bus.on('update:' + service.device.UDN, function (service) {
+    // receive a notification when that service is updated - nb. this will only happen after
+    // the service max-age is reached - the recommended default in the spec is 30 minutes
+  })
 })
 ```
 
@@ -44,7 +49,7 @@ Don't pass any options to the `discover` method (n.b. you will also receive prot
 
 ```javascript
 bus.discover()
-bus.on('*', function (service) {
+bus.on('discover:*', function (service) {
   // receive a notification about all service types
 })
 ```
@@ -107,18 +112,25 @@ var bus = ssdp({
 })
 bus.on('error', console.error)
 
-// search for one type of service
-bus.search('urn:schemas-upnp-org:service:ContentDirectory:1')
+// this is the type of service we are interested in
+var usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
 
-bus.on('urn:schemas-upnp-org:service:ContentDirectory:1', function (service) {
-  // receive a notification about one service type
+// search for one type of service
+bus.search(usn)
+
+bus.on('discover:' + usn, function (service) {
+  // receive a notification when a service of the passed type is discovered
+
+  bus.on('update:' + service.device.UDN, function (service) {
+    // receive a notification when that service is updated
+  })
 })
 
 // search for all types of service
 bus.discover()
 
-bus.on('urn:schemas-upnp-org:service:ContentDirectory:1', function (service) {
-  // receive a notification about all service types
+bus.on('discover:*', function (service) {
+  // receive a notification about all discovered services
 })
 
 // advertise a service
@@ -128,24 +140,24 @@ bus.advertise({
   ttl: 1800000, // how long the advert is valid for in ms
   ipv4: true, // whether or not to broadcast the advert over IPv4
   ipv6: true, // whether or not to broadcast the advert over IPv6
-  location: null, // a string location or leave out to have it auto-generated
+  location: null, // a hash of type/url hash or omit to have it auto-generated
   // if location is null, specify a function that passes a description object to the callback
   details: function (callback) {
     callback(null, {
-      // ...
+      // description key/value pairs (see below for more information)
     })
   }
 }, function (error, advert) {
   // stop advertising a service
-  bus.stop()
+  advert.stop()
 })
 ```
 
 ### Device description document
 
-During UPnP device discovery, clients can request a description of the various capabilities your serivce offers.  To do
-this you can either store an xml document and set the `location` field of your advert to point at that document or have
-it automatically generated.
+During UPnP device discovery, clients can request a [description of the various capabilities your service offers](http://jan.newmarch.name/internetdevices/upnp/upnp-devices.html).
+To do this you can either store an xml document and set the `location` field of your advert to point at that document
+or have it automatically generated.
 
 E.g., create a document, `description.xml` and put it on a server at `http://server.com/path/to/description.xml`:
 
@@ -177,11 +189,14 @@ Then create your advert:
 ```javascript
 bus.advertise({
   usn: 'urn:schemas-upnp-org:device:Basic:1',
-  location: 'http://server.com/path/to/description.xml'
+  location: {
+    udp4: 'http://192.168.1.40/path/to/description.xml'
+  }
 })
 ```
 
-Alternatively provide a function that will pass an object to a callback and let this module do the heavy lifting (n.b. your object will be run through the [xml2js Builder](https://libraries.io/npm/xml2js#user-content-xml-builder-usage)):
+Alternatively provide a function that will pass an object to a callback and let this module do the heavy lifting (n.b.
+your object will be run through the [xml2js Builder](https://libraries.io/npm/xml2js#user-content-xml-builder-usage)):
 
 ```javascript
 bus.advertise({
@@ -214,7 +229,8 @@ bus.advertise({
 })
 ```
 
-A random high port will be chosen, a http server will listen on that port and serve the descriptor and the `LOCATION` header will be set appropriately in all `ssdp` messages.
+A random high port will be chosen, a http server will listen on that port and serve the descriptor and the `LOCATION`
+header will be set appropriately in all `ssdp` messages.
 
 The server will be shut down when you call `advert.stop`.
 

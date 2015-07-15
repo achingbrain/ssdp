@@ -8,14 +8,13 @@ describe('lib/advertise/stop-advert', function () {
 
   it('should stop an advert', function (done) {
     var ssdp = {
+      emit: sinon.stub(),
       sockets: [{
-        type: 'udp4',
         options: {
           broadcast: {
 
           }
-        },
-        send: sinon.stub().callsArg(5)
+        }
       }],
       options: {
         signature: 'foo'

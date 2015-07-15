@@ -7,19 +7,15 @@ var proxyquire = require('proxyquire')
 
 describe('lib/commands/notify', function () {
   var notify
-  var resolveLocation
+  var resolveService
   var cache
 
   beforeEach(function () {
-    resolveLocation = sinon.stub()
-    cache = {
-      get: sinon.stub(),
-      set: sinon.stub(),
-      drop: sinon.stub()
-    }
+    cache = {}
+    resolveService = sinon.stub()
 
     notify = proxyquire('../../../lib/commands/notify', {
-      './resolve-location': resolveLocation,
+      './resolve-service': resolveService,
       '../cache': cache
     })
   })
@@ -33,25 +29,25 @@ describe('lib/commands/notify', function () {
 
     notify({}, message)
 
-    expect(resolveLocation.called).to.be.false
+    expect(resolveService.called).to.be.false
 
     message.headers.LOCATION = 'location'
 
     notify({}, message)
 
-    expect(resolveLocation.called).to.be.false
+    expect(resolveService.called).to.be.false
 
     message.headers.USN = 'usn'
 
     notify({}, message)
 
-    expect(resolveLocation.called).to.be.false
+    expect(resolveService.called).to.be.false
 
     message.headers.NT = 'ns'
 
     notify({}, message)
 
-    expect(resolveLocation.called).to.be.false
+    expect(resolveService.called).to.be.false
   })
 
   it('should cache service', function () {
@@ -59,112 +55,37 @@ describe('lib/commands/notify', function () {
       emit: sinon.stub()
     }
     var message = {
-      headers: {
-        LOCATION: 'location',
-        USN: 'usn',
-        NT: 'nt',
-        NTS: 'nts'
-      }
+      LOCATION: 'location',
+      USN: 'usn',
+      NT: 'nt',
+      NTS: 'nts',
+      ttl: sinon.stub().returns(1000)
     }
-    var location = 'location'
+    var remote = {}
 
-    resolveLocation.callsArgWith(1, null, location)
-    cache.set.callsArg(3)
+    notify(ssdp, message, remote)
 
-    notify(ssdp, message)
-
-    expect(ssdp.emit.calledWith(message.headers.NT)).to.be.true
+    expect(resolveService.calledOnce).to.be.true
   })
 
-  it('should emit error when resolving location', function () {
+  it('should remove service from cache', function () {
     var ssdp = {
       emit: sinon.stub()
     }
     var message = {
-      headers: {
-        LOCATION: 'location',
-        USN: 'usn',
-        NT: 'nt',
-        NTS: 'nts'
-      }
+      LOCATION: 'location',
+      USN: 'usn',
+      NT: 'nt',
+      NTS: 'ssdp:byebye',
+      ttl: sinon.stub().returns(1000)
     }
-    var error = new Error('Urk!')
+    var remote = {}
 
-    resolveLocation.callsArgWith(1, error)
+    cache['usn'] = {}
 
-    notify(ssdp, message)
+    notify(ssdp, message, remote)
 
-    expect(ssdp.emit.calledWith('error', error)).to.be.true
-  })
-
-  it('should emit error when caching service', function () {
-    var ssdp = {
-      emit: sinon.stub()
-    }
-    var message = {
-      headers: {
-        LOCATION: 'location',
-        USN: 'usn',
-        NT: 'nt',
-        NTS: 'nts'
-      }
-    }
-    var location = 'location'
-    var error = new Error('Urk!')
-
-    resolveLocation.callsArgWith(1, null, location)
-    cache.set.callsArgWith(3, error)
-
-    notify(ssdp, message)
-
-    expect(ssdp.emit.calledWith('error', error)).to.be.true
-  })
-
-  it('should not resolve location for service that is going away', function () {
-    var ssdp = {
-      emit: sinon.stub()
-    }
-    var message = {
-      headers: {
-        LOCATION: 'location',
-        USN: 'usn',
-        NT: 'nt',
-        NTS: 'ssdp:byebye'
-      }
-    }
-    var location = 'location'
-
-    resolveLocation.callsArgWith(1, null, location)
-    cache.drop.callsArg(1)
-
-    notify(ssdp, message)
-
-    expect(ssdp.emit.calledWith(message.headers.NTS)).to.be.true
-    expect(resolveLocation.called).to.be.false
-  })
-
-  it('should emit error when dropping service that is going away fails', function () {
-    var ssdp = {
-      emit: sinon.stub()
-    }
-    var message = {
-      headers: {
-        LOCATION: 'location',
-        USN: 'usn',
-        NT: 'nt',
-        NTS: 'ssdp:byebye'
-      }
-    }
-    var location = 'location'
-    var error = new Error('Urk!')
-
-    resolveLocation.callsArgWith(1, null, location)
-    cache.drop.callsArgWith(1, error)
-
-    notify(ssdp, message)
-
-    expect(ssdp.emit.calledWith('error', error)).to.be.true
-    expect(ssdp.emit.calledWith(message.headers.NTS)).to.be.true
-    expect(resolveLocation.called).to.be.false
+    expect(cache['usn']).to.not.exist
+    expect(ssdp.emit.calledWith('remove:usn')).to.be.true
   })
 })

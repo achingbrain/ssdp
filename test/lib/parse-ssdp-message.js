@@ -2,10 +2,10 @@ var describe = require('mocha').describe
 var it = require('mocha').it
 var expect = require('chai').expect
 var sinon = require('sinon')
-var parse = require('../../../lib/parse')
+var parse = require('../../lib/parse-ssdp-message')
 var proxyquire = require('proxyquire')
 
-describe('lib/parse', function () {
+describe('lib/parse-ssdp-message', function () {
 
   it('should parse search request', function () {
     var type = 'M-SEARCH'
@@ -29,12 +29,11 @@ describe('lib/parse', function () {
     parse(ssdp, message, remoteInfo)
 
     expect(ssdp.emit.called).to.be.true
-    expect(ssdp.emit.getCall(0).args[0]).to.equal(type)
-    expect(ssdp.emit.getCall(0).args[1].type).to.equal(type)
-    expect(ssdp.emit.getCall(0).args[1].headers.HOST).to.equal(host)
-    expect(ssdp.emit.getCall(0).args[1].headers.ST).to.equal(serviceType)
-    expect(ssdp.emit.getCall(0).args[1].headers.MAN).to.equal(action)
-    expect(ssdp.emit.getCall(0).args[1].headers.MX).to.equal(mx)
+    expect(ssdp.emit.getCall(0).args[0]).to.equal('ssdp:' + type.toLowerCase())
+    expect(ssdp.emit.getCall(0).args[1].HOST).to.equal(host)
+    expect(ssdp.emit.getCall(0).args[1].ST).to.equal(serviceType)
+    expect(ssdp.emit.getCall(0).args[1].MAN).to.equal(action)
+    expect(ssdp.emit.getCall(0).args[1].MX).to.equal(mx)
   })
 
   it('should parse a notify request', function () {
@@ -70,18 +69,18 @@ describe('lib/parse', function () {
     parse(ssdp, message, remoteInfo)
 
     expect(ssdp.emit.called).to.be.true
-    expect(ssdp.emit.getCall(0).args[0]).to.equal(type)
-    expect(ssdp.emit.getCall(0).args[1].type).to.equal(type)
-    expect(ssdp.emit.getCall(0).args[1].ttl).to.equal(maxAge)
-    expect(ssdp.emit.getCall(0).args[1].headers.HOST).to.equal(host)
-    expect(ssdp.emit.getCall(0).args[1].headers.NT).to.equal(notificationType)
-    expect(ssdp.emit.getCall(0).args[1].headers.NTS).to.equal(notificatonSubtype)
-    expect(ssdp.emit.getCall(0).args[1].headers.LOCATION).to.equal(location)
-    expect(ssdp.emit.getCall(0).args[1].headers.USN).to.equal(usn)
-    expect(ssdp.emit.getCall(0).args[1].headers['CACHE-CONTROL']).to.equal(cacheControl)
-    expect(ssdp.emit.getCall(0).args[1].headers.SERVER).to.equal(server)
-    expect(ssdp.emit.getCall(0).args[1].headers.OPT).to.equal(opt)
-    expect(ssdp.emit.getCall(0).args[1].headers['01-NLS']).to.equal(nls)
+    expect(ssdp.emit.getCall(0).args[0]).to.equal('ssdp:' + type.toLowerCase())
+    expect(ssdp.emit.getCall(0).args[1].ttl()).to.equal(maxAge * 1000)
+    expect(ssdp.emit.getCall(0).args[1].HOST).to.equal(host)
+    expect(ssdp.emit.getCall(0).args[1].NT).to.equal(notificationType)
+    expect(ssdp.emit.getCall(0).args[1].NTS).to.equal(notificatonSubtype)
+    expect(ssdp.emit.getCall(0).args[1].LOCATION).to.equal(location)
+    expect(ssdp.emit.getCall(0).args[1].USN).to.equal(usn)
+    expect(ssdp.emit.getCall(0).args[1]['CACHE-CONTROL']).to.equal(cacheControl)
+    expect(ssdp.emit.getCall(0).args[1].SERVER).to.equal(server)
+    expect(ssdp.emit.getCall(0).args[1].OPT).to.equal(opt)
+    expect(ssdp.emit.getCall(0).args[1]['01-NLS']).to.equal(nls)
+    expect(ssdp.emit.getCall(0).args[1].remote()).to.equal(remoteInfo)
   })
 
   it('should parse a search response', function () {
@@ -109,14 +108,13 @@ describe('lib/parse', function () {
     parse(ssdp, message, remoteInfo)
 
     expect(ssdp.emit.called).to.be.true
-    expect(ssdp.emit.getCall(0).args[0]).to.equal('SEARCH-RESPONSE')
-    expect(ssdp.emit.getCall(0).args[1].type).to.equal('SEARCH-RESPONSE')
-    expect(ssdp.emit.getCall(0).args[1].ttl).to.equal(maxAge)
-    expect(ssdp.emit.getCall(0).args[1].headers.LOCATION).to.equal(location)
-    expect(ssdp.emit.getCall(0).args[1].headers.USN).to.equal(usn)
-    expect(ssdp.emit.getCall(0).args[1].headers['CACHE-CONTROL']).to.equal(cacheControl)
-    expect(ssdp.emit.getCall(0).args[1].headers.SERVER).to.equal(server)
-    expect(ssdp.emit.getCall(0).args[1].headers.ST).to.equal(serviceType)
+    expect(ssdp.emit.getCall(0).args[0]).to.equal('ssdp:search-response')
+    expect(ssdp.emit.getCall(0).args[1].ttl()).to.equal(maxAge * 1000)
+    expect(ssdp.emit.getCall(0).args[1].LOCATION).to.equal(location)
+    expect(ssdp.emit.getCall(0).args[1].USN).to.equal(usn)
+    expect(ssdp.emit.getCall(0).args[1]['CACHE-CONTROL']).to.equal(cacheControl)
+    expect(ssdp.emit.getCall(0).args[1].SERVER).to.equal(server)
+    expect(ssdp.emit.getCall(0).args[1].ST).to.equal(serviceType)
   })
 
   it('should ignore own messages', function () {
@@ -127,8 +125,8 @@ describe('lib/parse', function () {
       address: '192.168.0.1'
     }])
 
-    parse = proxyquire('../../../lib/parse', {
-      '../find-all-interfaces': findAllInterfaces
+    parse = proxyquire('../../lib/parse-ssdp-message', {
+      './find-all-interfaces': findAllInterfaces
     })
 
     var ssdp = {

@@ -7,20 +7,20 @@ var proxyquire = require('proxyquire')
 
 describe('lib/commands/search', function () {
   var search
-  var sendSsdpMessage
   var adverts
 
   beforeEach(function () {
-    sendSsdpMessage = sinon.stub()
     adverts = []
 
     search = proxyquire('../../../lib/commands/search', {
-      '../send-ssdp-message': sendSsdpMessage,
       '../adverts': adverts
     })
   })
 
   it('should reject invalid messages', function () {
+    var ssdp = {
+      emit: sinon.stub()
+    }
     var message = {
       headers: {
 
@@ -29,22 +29,25 @@ describe('lib/commands/search', function () {
 
     search({}, message)
 
-    expect(sendSsdpMessage.called).to.be.false
+    expect(ssdp.emit.called).to.be.false
   })
 
-  it('should respond to global search', function (done) {
+  it('should respond to a global search', function () {
     var ssdp = {
       udn: 'udn',
-      sockets: [{
-        type: 'udp4'
-      }]
+      emit: sinon.stub(),
+      options: {
+        signature: 'signature'
+      }
     }
     var message = {
-      headers: {
-        MAN: 'man',
-        MX: 'usn',
-        ST: 'ssdp:all'
-      }
+      MAN: 'man',
+      MX: 'usn',
+      ST: 'ssdp:all'
+    }
+    var remote = {
+      address: 'remote-address',
+      port: 'remote-port'
     }
     var advert = {
       service: {
@@ -58,39 +61,43 @@ describe('lib/commands/search', function () {
 
     adverts.push(advert)
 
-    sendSsdpMessage.callsArgWith(2, ssdp.sockets[0], function (error, message) {
-      expect(error).to.not.exist
+    search(ssdp, message, remote)
 
-      message = message.toString('utf8')
-
-      expect(message).to.contain(advert.service.usn)
-      expect(message).to.contain(advert.service.usn + '::' + ssdp.udn)
-      expect(message).to.contain(advert.service.location.udp4)
-
-      done()
-    })
-
-    search(ssdp, message)
-
-    expect(sendSsdpMessage.called).to.be.true
+    expect(ssdp.emit.calledOnce).to.be.true
+    expect(ssdp.emit.getCall(0).args[0]).to.equal('ssdp:send-message')
+    expect(ssdp.emit.getCall(0).args[1]).to.equal('HTTP/1.1 200 OK')
+    expect(ssdp.emit.getCall(0).args[2].ST).to.equal(advert.service.usn)
+    expect(ssdp.emit.getCall(0).args[2].USN).to.equal(ssdp.udn + '::' + advert.service.usn)
+    expect(ssdp.emit.getCall(0).args[2].LOCATION).to.equal(advert.service.location)
+    expect(ssdp.emit.getCall(0).args[3]).to.deep.equal(remote)
   })
 
-  it('should respond to global search', function () {
+  it('should respond to a search', function () {
     var ssdp = {
       udn: 'udn',
-      sockets: 'sockets'
-    }
-    var message = {
-      headers: {
-        MAN: 'man',
-        MX: 'usn',
-        ST: 'usn'
+      sockets: [{
+        type: 'udp4'
+      }],
+      emit: sinon.stub(),
+      options: {
+        signature: 'signature'
       }
     }
-
+    var message = {
+      MAN: 'man',
+      MX: 'usn',
+      ST: 'usn'
+    }
+    var remote = {
+      address: 'remote-address',
+      port: 'remote-port'
+    }
     adverts.push({
       service: {
-        usn: 'usn'
+        usn: 'usn',
+        location: {
+          udp4: 'usn-udp4-location'
+        }
       }
     }, {
       service: {
@@ -98,8 +105,8 @@ describe('lib/commands/search', function () {
       }
     })
 
-    search(ssdp, message)
+    search(ssdp, message, remote)
 
-    expect(sendSsdpMessage.calledOnce).to.be.true
+    expect(ssdp.emit.calledOnce).to.be.true
   })
 })

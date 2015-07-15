@@ -6,60 +6,34 @@ var discover = require('../../../lib/discover')
 
 describe('lib/discover', function () {
 
-  it('should send a search message', function (done) {
+  it('should send a search message', function () {
     var ssdp = {
-      sockets: [{
-        options: {
-          broadcast: {
-
-          },
-          bind: {
-
-          }
-        },
-        send: sinon.stub().callsArg(5)
-      }]
+      emit: sinon.stub()
     }
     var serviceType = 'serviceType'
 
-    discover(ssdp, serviceType, function (error) {
-      expect(error).to.not.exist
+    discover(ssdp, serviceType)
 
-      var message = ssdp.sockets[0].send.getCall(0).args[0]
-      message = message.toString('utf8')
-
-      expect(message).to.contain('M-SEARCH')
-      expect(message).to.contain('ST: ' + serviceType)
-
-      done()
-    })
+    expect(ssdp.emit.calledOnce).to.be.true
+    expect(ssdp.emit.getCall(0).args[0]).to.equal('ssdp:send-message')
+    expect(ssdp.emit.getCall(0).args[1]).to.equal('M-SEARCH * HTTP/1.1')
+    expect(ssdp.emit.getCall(0).args[2].ST).to.equal(serviceType)
+    expect(ssdp.emit.getCall(0).args[2].MAN).to.equal('ssdp:discover')
+    expect(ssdp.emit.getCall(0).args[2].MX).to.equal(0)
   })
 
-  it('should default to global search', function (done) {
+  it('should default to global search', function () {
     var ssdp = {
-      sockets: [{
-        options: {
-          broadcast: {
-
-          },
-          bind: {
-
-          }
-        },
-        send: sinon.stub().callsArg(5)
-      }]
+      emit: sinon.stub()
     }
 
-    discover(ssdp, null, function (error) {
-      expect(error).to.not.exist
+    discover(ssdp)
 
-      var message = ssdp.sockets[0].send.getCall(0).args[0]
-      message = message.toString('utf8')
-
-      expect(message).to.contain('M-SEARCH')
-      expect(message).to.contain('ST: ssdp:all')
-
-      done()
-    })
+    expect(ssdp.emit.calledOnce).to.be.true
+    expect(ssdp.emit.getCall(0).args[0]).to.equal('ssdp:send-message')
+    expect(ssdp.emit.getCall(0).args[1]).to.equal('M-SEARCH * HTTP/1.1')
+    expect(ssdp.emit.getCall(0).args[2].ST).to.equal('ssdp:all')
+    expect(ssdp.emit.getCall(0).args[2].MAN).to.equal('ssdp:discover')
+    expect(ssdp.emit.getCall(0).args[2].MX).to.equal(0)
   })
 })
