@@ -29,7 +29,10 @@ describe('lib/advertise/create-location', function () {
         type: 'udp4'
       }]
     }
-    var advert = {}
+    var advert = {
+      ipv4: true,
+      ipv6: true
+    }
     var ifaces = [{
       address: 'address'
     }]
@@ -62,7 +65,10 @@ describe('lib/advertise/create-location', function () {
         type: 'udp6'
       }]
     }
-    var advert = {}
+    var advert = {
+      ipv4: true,
+      ipv6: true
+    }
     var ifaces = [{
       address: 'address'
     }]
@@ -102,13 +108,37 @@ describe('lib/advertise/create-location', function () {
     })
   })
 
+  it('should not create ipv4 location when advertising over ipv4 is disabled', function (done) {
+    var ssdp = {
+      sockets: [{
+        type: 'udp4'
+      }]
+    }
+    var advert = {
+      ipv4: false
+    }
+
+    findAllInterfaces.withArgs(false, false).returns([])
+    findAllInterfaces.withArgs(true, false).returns(['foo'])
+
+    createLocation(ssdp, advert, function (error) {
+      expect(error).to.not.exist
+      expect(freeport.called).to.be.false
+
+      done()
+    })
+  })
+
   it('should return error when finding port', function (done) {
     var ssdp = {
       sockets: [{
         type: 'udp4'
       }]
     }
-    var advert = {}
+    var advert = {
+      ipv4: true,
+      ipv6: true
+    }
     var ifaces = [{
       address: 'address'
     }]
