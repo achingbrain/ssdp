@@ -238,3 +238,6 @@ The server will be shut down when you call `advert.stop`.
 
  * [diversario/node-ssdp](https://github.com/diversario/node-ssdp)
  * [Xedecimal/node-ssdp](https://www.npmjs.com/package/ssdp) (no longer maintained)
+ * [LG SSDP discovery documentation](http://developer.lgappstv.com/TV_HELP/topic/lge.tvsdk.references.book/html/UDAP/UDAP/Discovery.htm)
+ * [UPnP overview](http://jan.newmarch.name/internetdevices/upnp/upnp.html)
+ * [UPnP device description](http://jan.newmarch.name/internetdevices/upnp/upnp-devices.html)
