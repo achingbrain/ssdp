@@ -31,11 +31,13 @@ describe('lib/commands/resolve-service', function () {
       expires: Date.now() + 10
     }
 
-    cache['usn'] = service
+    cache['st'] = {
+      usn: service
+    }
 
     resolveService({}, 'usn', 'st', 'location', 'ttl')
 
-    expect(cache['usn']).to.equal(service)
+    expect(cache['st']['usn']).to.equal(service)
   })
 
   it('should emit error when resolving location fails', function () {

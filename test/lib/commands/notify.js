@@ -81,11 +81,31 @@ describe('lib/commands/notify', function () {
     }
     var remote = {}
 
-    cache['usn'] = {}
+    cache['nt'] = {
+      'usn': {}
+    }
 
     notify(ssdp, message, remote)
 
-    expect(cache['usn']).to.not.exist
+    expect(cache['nt']['usn']).to.not.exist
+    expect(ssdp.emit.calledWith('remove:usn')).to.be.true
+  })
+
+  it('should survice removing non-existent service from cache', function () {
+    var ssdp = {
+      emit: sinon.stub()
+    }
+    var message = {
+      LOCATION: 'location',
+      USN: 'usn',
+      NT: 'nt',
+      NTS: 'ssdp:byebye',
+      ttl: sinon.stub().returns(1000)
+    }
+    var remote = {}
+
+    notify(ssdp, message, remote)
+
     expect(ssdp.emit.calledWith('remove:usn')).to.be.true
   })
 })
