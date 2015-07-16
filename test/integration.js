@@ -311,7 +311,6 @@ describe('ssdp', function () {
       'EXT:\r\n' +
       'ST: urn:schemas-upnp-org:device:Basic:1\r\n' +
       'USN: uuid:2f402f80-da50-11e1-9b23-00178809ea66\r\n' +
-      'CACHE-CONTROL: max-age=1800\r\n' +
       'SERVER: node.js/0.12.6 UPnP/1.1 @achingbrain/ssdp/0.0.1\r\n' +
       'LOCATION: ' + detailsLocation
 
@@ -325,7 +324,6 @@ describe('ssdp', function () {
       'EXT:\r\n' +
       'ST: urn:schemas-upnp-org:device:Basic:1\r\n' +
       'USN: uuid:2f402f80-da50-11e1-9b23-00178809ea66\r\n' +
-      'CACHE-CONTROL: max-age=1800\r\n' +
       'SERVER: node.js/0.12.6 UPnP/1.1 @achingbrain/ssdp/0.0.1\r\n' +
       'LOCATION: ' + detailsLocation
 
