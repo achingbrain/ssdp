@@ -45,14 +45,6 @@ describe('ssdp', function () {
           bus.on('ready', function () {
             callback()
           })
-          bus.on('transport:outgoing-message', function (socket, message, recipient) {
-            console.info('-> Outgoing to %s:%s', socket.type, recipient.address, recipient.port)
-            console.info(message.toString('utf8'))
-          })
-          bus.on('transport:incoming-message', function (message, remote) {
-            console.info('<- Incoming from %s:%s', remote.address, remote.port)
-            console.info(message.toString('utf8'))
-          })
         })
       },
       function (callback) {
