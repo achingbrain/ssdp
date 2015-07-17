@@ -1,6 +1,6 @@
 {
   "name": "@achingbrain/ssdp",
-  "description": "An implemenatation of SSDP for node.js",
+  "description": "Yet another SSDP implementation for node.js",
   "keywords": [
     "ssdp",
     "multicast",

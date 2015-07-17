@@ -4,7 +4,7 @@
 [![Coverage Status](https://img.shields.io/coveralls/achingbrain/node-ssdp.svg)](https://coveralls.io/r/achingbrain/ssdp?branch=master)
 [![Dependency Status](https://david-dm.org/achingbrain/node-ssdp.png)](https://david-dm.org/achingbrain/ssdp)
 
-An implementation of the Simple Service Discovery protocol for node.
+Yet another SSDP implementation for node.js
 
 ## Installation
 
