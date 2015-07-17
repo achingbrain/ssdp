@@ -1,8 +1,8 @@
 # SSDP
 
 [![Build Status](https://travis-ci.org/achingbrain/ssdp.svg?branch=master)](https://travis-ci.org/achingbrain/ssdp)
-[![Coverage Status](https://img.shields.io/coveralls/achingbrain/node-ssdp.svg)](https://coveralls.io/r/achingbrain/ssdp?branch=master)
-[![Dependency Status](https://david-dm.org/achingbrain/node-ssdp.png)](https://david-dm.org/achingbrain/ssdp)
+[![Coverage Status](https://coveralls.io/repos/achingbrain/ssdp/badge.svg?branch=master&service=github)](https://coveralls.io/github/achingbrain/ssdp?branch=master)
+[![Dependency Status](https://david-dm.org/achingbrain/ssdp.svg)](https://david-dm.org/achingbrain/ssdp)
 
 Yet another SSDP implementation for node.js
 
