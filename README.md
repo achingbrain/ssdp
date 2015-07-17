@@ -234,6 +234,21 @@ header will be set appropriately in all `ssdp` messages.
 
 The server will be shut down when you call `advert.stop`.
 
+### I want to see all protocol messages
+
+No problem, try this:
+
+```javascript
+bus.on('transport:outgoing-message', function (socket, message, remote) {
+  console.info('-> Outgoing to %s:%s via %s', remote.address, remote.port, socket.type)
+  console.info(message.toString('utf8'))
+})
+bus.on('transport:incoming-message', function (message, remote) {
+  console.info('<- Incoming from %s:%s', remote.address, remote.port)
+  console.info(message.toString('utf8'))
+})
+```
+
 ## References
 
  * [diversario/node-ssdp](https://github.com/diversario/node-ssdp)
