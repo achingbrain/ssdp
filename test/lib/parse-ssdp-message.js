@@ -130,14 +130,59 @@ describe('lib/parse-ssdp-message', function () {
     })
 
     var ssdp = {
-      emit: sinon.stub()
+      emit: sinon.stub(),
+      sockets: [{
+        options: {
+          bind: {
+            port: 2891
+          }
+        }
+      }, {
+        options: {
+          bind: {
+            port: 2892
+          }
+        }
+      }]
     }
 
-    parse(ssdp, '', {
-      address: '127.0.0.1'
+    parse(ssdp, 'M-SEARCH * HTTP/1.1', {
+      address: '127.0.0.1',
+      port: 2891
     })
 
     expect(ssdp.emit.called).to.be.false
+  })
+
+  it('should reply to messages from same host but different port', function () {
+    var findAllInterfaces = sinon.stub()
+    findAllInterfaces.returns([{
+      address: '127.0.0.1'
+    }, {
+      address: '192.168.0.1'
+    }])
+
+    parse = proxyquire('../../lib/parse-ssdp-message', {
+      './find-all-interfaces': findAllInterfaces
+    })
+
+    var ssdp = {
+      emit: sinon.stub(),
+      sockets: [{
+        options: {
+          bind: {
+            port: 2891
+          }
+        }
+      }]
+    }
+
+    parse(ssdp, 'M-SEARCH * HTTP/1.1', {
+      address: '192.168.0.1',
+      port: 3982
+    })
+
+    expect(ssdp.emit.called).to.be.true
   })
 
   it('should ignore messages with unknown type', function () {
