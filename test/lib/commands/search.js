@@ -85,8 +85,46 @@ describe('lib/commands/search', function () {
     }
     var message = {
       MAN: 'man',
-      MX: 'usn',
+      MX: 0,
       ST: 'usn'
+    }
+    var remote = {
+      address: 'remote-address',
+      port: 'remote-port'
+    }
+    adverts.push({
+      service: {
+        usn: 'usn',
+        location: {
+          udp4: 'usn-udp4-location'
+        }
+      }
+    }, {
+      service: {
+        usn: 'not-usn'
+      }
+    })
+
+    search(ssdp, message, remote)
+
+    expect(ssdp.emit.calledOnce).to.be.true
+  })
+
+  it('should respond to a search in a case insensitive manner', function () {
+    var ssdp = {
+      udn: 'udn',
+      sockets: [{
+        type: 'udp4'
+      }],
+      emit: sinon.stub(),
+      options: {
+        signature: 'signature'
+      }
+    }
+    var message = {
+      MAN: 'man',
+      MX: 0,
+      ST: 'USN'
     }
     var remote = {
       address: 'remote-address',
