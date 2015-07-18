@@ -52,4 +52,37 @@ describe('lib/commands/resolve-service', function () {
 
     expect(ssdp.emit.calledWith('error', error)).to.be.true
   })
+
+  it('should should not emit update when device details have not changed', function () {
+    resolveLocation.withArgs('location').callsArgWith(1, null, 'details')
+
+    var ssdp = {
+      emit: sinon.stub()
+    }
+
+    resolveService(ssdp, 'usn', 'st', 'location', -1)
+
+    expect(ssdp.emit.calledWith('discover:st')).to.be.true
+
+    resolveService(ssdp, 'usn', 'st', 'location', -1)
+
+    expect(ssdp.emit.calledWith('update:usn')).to.be.false
+  })
+
+  it('should should emit update when device details have changed', function () {
+    resolveLocation.withArgs('location').onFirstCall().callsArgWith(1, null, 'details')
+    resolveLocation.withArgs('location').onSecondCall().callsArgWith(1, null, 'details2')
+
+    var ssdp = {
+      emit: sinon.stub()
+    }
+
+    resolveService(ssdp, 'usn', 'st', 'location', -1)
+
+    expect(ssdp.emit.calledWith('discover:st')).to.be.true
+
+    resolveService(ssdp, 'usn', 'st', 'location', -1)
+
+    expect(ssdp.emit.calledWith('update:usn')).to.be.true
+  })
 })

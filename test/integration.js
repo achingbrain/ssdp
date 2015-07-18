@@ -16,14 +16,15 @@ var _ = require('lodash')
 describe('ssdp', function () {
   var bus
   var detailsServer
-  var details = {
-    foo: 'bar'
-  }
+  var details
   var detailsLocation
   var clock
 
   beforeEach(function (done) {
     clock = sinon.useFakeTimers()
+    details = {
+      foo: 'bar'
+    }
 
     async.parallel([
       function (callback) {
@@ -112,6 +113,9 @@ describe('ssdp', function () {
 
       // expire the detail cache
       clock.tick(1900000)
+
+      // change the details
+      details.bar = 'baz'
 
       bus.emit('transport:incoming-message', new Buffer(message), {address: 'test', port: 'test'})
     })
@@ -327,6 +331,9 @@ describe('ssdp', function () {
 
       // expire the detail cache
       clock.tick(1900000)
+
+      // change the details
+      details.bar = 'baz'
 
       bus.emit('transport:incoming-message', new Buffer(message), {address: 'test', port: 'test'})
     })
