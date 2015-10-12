@@ -5,7 +5,6 @@ var sinon = require('sinon')
 var stopAdvert = require('../../../lib/advertise/stop-advert')
 
 describe('lib/advertise/stop-advert', function () {
-
   it('should stop an advert', function (done) {
     var ssdp = {
       emit: sinon.stub(),

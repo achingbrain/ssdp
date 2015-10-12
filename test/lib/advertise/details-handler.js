@@ -5,7 +5,6 @@ var sinon = require('sinon')
 var detailsHandler = require('../../../lib/advertise/details-handler')
 
 describe('lib/advertise/details-handler', function () {
-
   it('should return error when creating details fails', function (done) {
     var error = new Error('Urk!')
 

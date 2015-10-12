@@ -4,7 +4,6 @@ var expect = require('chai').expect
 var parseOptions = require('../../../lib/advertise/parse-options')
 
 describe('lib/advertise/parse-options', function () {
-
   it('should populate defaults', function () {
     var options = parseOptions({})
 

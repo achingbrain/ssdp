@@ -5,7 +5,6 @@ var sinon = require('sinon')
 var discover = require('../../../lib/discover')
 
 describe('lib/discover', function () {
-
   it('should send a search message', function () {
     var ssdp = {
       emit: sinon.stub()

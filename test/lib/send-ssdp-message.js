@@ -5,7 +5,6 @@ var sinon = require('sinon')
 var sendSsdpMessage = require('../../lib/send-ssdp-message')
 
 describe('lib/send-ssdp-message', function () {
-
   it('should send a message', function () {
     var ssdp = {
       emit: sinon.stub(),

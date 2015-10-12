@@ -4,7 +4,6 @@ var expect = require('chai').expect
 var defaultSsdpOptions = require('../../lib/default-ssdp-options')
 
 describe('lib/default-ssdp-options', function () {
-
   it('should populate defaults', function () {
     var options = defaultSsdpOptions({})
 

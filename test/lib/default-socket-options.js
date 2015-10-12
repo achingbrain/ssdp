@@ -4,7 +4,6 @@ var expect = require('chai').expect
 var defaultSocketOptions = require('../../lib/default-socket-options')
 
 describe('lib/default-socket-options', function () {
-
   it('should populate defaults', function () {
     var socket = defaultSocketOptions({})
 

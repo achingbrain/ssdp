@@ -5,7 +5,6 @@ var expect = require('chai').expect
 var callbackOrEmit = require('../../lib/callback-or-emit')
 
 describe('lib/callback-or-emit', function () {
-
   it('should honor passed callback', function (done) {
     var callback = callbackOrEmit(null, done)
 

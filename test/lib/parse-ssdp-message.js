@@ -6,7 +6,6 @@ var parse = require('../../lib/parse-ssdp-message')
 var proxyquire = require('proxyquire')
 
 describe('lib/parse-ssdp-message', function () {
-
   it('should parse search request', function () {
     var type = 'M-SEARCH'
     var host = '239.255.255.250:1900'
