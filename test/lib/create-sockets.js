@@ -63,8 +63,8 @@ describe('lib/create-sockets', function () {
       setBroadcast: sinon.stub()
     }
 
-    dgram.createSocket.withArgs('udp4').returns(socket4)
-    dgram.createSocket.withArgs('udp6').returns(socket6)
+    dgram.createSocket.withArgs({type: 'udp4', reuseAddr: true}).returns(socket4)
+    dgram.createSocket.withArgs({type: 'udp6', reuseAddr: true}).returns(socket6)
 
     createSockets(ssdp, function (error, sockets) {
       expect(error).to.not.exist
@@ -112,7 +112,7 @@ describe('lib/create-sockets', function () {
       setBroadcast: sinon.stub()
     }
 
-    dgram.createSocket.withArgs('udp4').returns(socket4)
+    dgram.createSocket.withArgs({type: 'udp4', reuseAddr: true}).returns(socket4)
 
     createSockets(ssdp, function (error, sockets) {
       expect(error).to.not.exist
@@ -155,7 +155,7 @@ describe('lib/create-sockets', function () {
       address: sinon.stub().returns({})
     }
 
-    dgram.createSocket.withArgs('udp4').returns(socket4)
+    dgram.createSocket.withArgs({type: 'udp4', reuseAddr: true}).returns(socket4)
 
     createSockets(ssdp, function (err, sockets) {
       expect(err).to.equal(error)

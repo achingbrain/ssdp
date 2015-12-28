@@ -6,6 +6,10 @@
 
 Yet another SSDP implementation for node.js
 
+SSDP is a service discovery protocol that uses messages composed from HTTP-style headers sent over UDP.  It fulfills a similar role to mDNS but needs no extra libraries and is implemented completely in JavaScript.
+
+With SSDP a service will broadcast it's availability and respond to search messages over UDP and also present a description document that contains details of the capabilities it offers.  A client can then search for available services and use them as required.
+
 ## Installation
 
 ```sh
@@ -24,7 +28,7 @@ var bus = ssdp()
 bus.on('error', console.error)
 ```
 
-### Service discovery
+### Find a service
 
 Pass a `usn` to the `discover` method - when services are found events will be emitted:
 
@@ -36,7 +40,7 @@ bus.discover(usn)
 bus.on('discover:' + usn, function (service) {
   // receive a notification about a service
 
-  bus.on('update:' + service.device.UDN, function (service) {
+  bus.on('update:' + service.UDN, function (service) {
     // receive a notification when that service is updated - nb. this will only happen
     // after the service max-age is reached and if the service's device description
     // document has changed
@@ -44,7 +48,7 @@ bus.on('discover:' + usn, function (service) {
 })
 ```
 
-### Discover all services
+### Find all services
 
 Don't pass any options to the `discover` method (n.b. you will also receive protocol related events):
 
@@ -60,10 +64,69 @@ bus.on('discover:*', function (service) {
 ```javascript
 // advertise a service
 bus.advertise({
-  usn: 'a-usn'
+  usn: 'urn:schemas-upnp-org:service:ContentDirectory:1',
+  details: {
+    URLBase: 'https://192.168.0.1:8001'
+  }
 }, function (error, advert) {
   // stop advertising a service
   advert.stop()
+})
+```
+For full options, see [lib/advertise/parse-options.js](lib/advertise/parse-options.js)
+
+### Integrate with existing HTTP servers
+
+By default when you create an advertisment an HTTP server is created to serve the `details.xml` document that describes your service.  To use an existing server instead, do something like:
+
+#### Hapi
+
+```javascript
+bus.advertise({
+  usn: 'urn:schemas-upnp-org:service:ContentDirectory:1',
+  location: {
+    udp4: 'http://192.168.0.1:8000/ssdp/details.xml'
+  },
+  details: {
+    URLBase: 'https://192.168.0.1:8001'
+  }
+}, function (error, advert) {
+  server.route({
+    method: 'GET',
+    path: '/ssdp/details.xml',
+    handler: function (request, reply) {
+      advert.service.details(function (error, details) {
+        reply(error, details)
+          .type('text/xml')
+      })
+    }
+  })
+
+  callback(error, server)
+})
+```
+
+#### Express
+
+```javascript
+bus.advertise({
+  usn: 'urn:schemas-upnp-org:service:ContentDirectory:1',
+  location: {
+    udp4: 'http://192.168.0.1:8000/ssdp/details.xml'
+  },
+  details: {
+    URLBase: 'https://192.168.0.1:8001'
+  }
+}, function (error, advert) {
+  app.get('/ssdp/details.xml', function (request, response) {
+      advert.service.details(function (error, details) {
+        response.set('Content-Type', 'text/xml')
+        response.send(details)
+      })
+    }
+  })
+
+  callback(error, server)
 })
 ```
 
@@ -117,7 +180,7 @@ bus.on('error', console.error)
 var usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
 
 // search for one type of service
-bus.search(usn)
+bus.discover(usn)
 
 bus.on('discover:' + usn, function (service) {
   // receive a notification when a service of the passed type is discovered
@@ -136,17 +199,34 @@ bus.on('discover:*', function (service) {
 
 // advertise a service
 bus.advertise({
-  usn: 'a-usn', // unqiue service name
+  usn: 'a-usn', // unique service name
   interval: 10000, // how often to broadcast service adverts in ms
   ttl: 1800000, // how long the advert is valid for in ms
   ipv4: true, // whether or not to broadcast the advert over IPv4
   ipv6: true, // whether or not to broadcast the advert over IPv6
-  location: null, // a hash of type/url hash or omit to have it auto-generated
-  // if location is null, specify a function that passes a description object to the callback
-  details: function (callback) {
-    callback(null, {
-      // description key/value pairs (see below for more information)
-    })
+  location: { // where the description document(s) are available - omit to have an http server automatically created
+    udp4: 'http://192.168.0.1/details.xml', // where the description document is available over ipv4
+    udp6: 'http://FE80::0202:B3FF:FE1E:8329/details.xml' // where the description document is available over ipv6
+  },
+  details: { // the contents of the description document
+    specVersion: {
+      major: 1,
+      minor: 1
+    },
+    URLBase: 'http://example.com',
+    device: {
+      deviceType: 'a-usn',
+      friendlyName: 'A friendly device name',
+      manufacturer: 'Manufactuer name',
+      manufacturerURL: 'http://example.com',
+      modelDescription: 'A description of the device',
+      modelName: 'A model name',
+      modelNumber: 'A vendor specific model number',
+      modelURL: 'http://example.com',
+      serialNumber: 'A device specific serial number',
+      UDN: 'unique-identifier' // should be the same as the bus UDN
+      presentationURL: 'index.html'
+    }
   }
 }, function (error, advert) {
   // stop advertising a service
@@ -196,36 +276,34 @@ bus.advertise({
 })
 ```
 
-Alternatively provide a function that will pass an object to a callback and let this module do the heavy lifting (n.b.
+Alternatively provide an descriptor object and let this module do the heavy lifting (n.b.
 your object will be run through the [xml2js Builder](https://libraries.io/npm/xml2js#user-content-xml-builder-usage)):
 
 ```javascript
 bus.advertise({
   usn: 'urn:schemas-upnp-org:device:Basic:1',
-  details: function (callback) {
-    callback(null, {
-      '$': {
-        'xmlns': 'urn:schemas-upnp-org:device-1-0'
-      },
-      'specVersion': {
-        'major': '1',
-        'minor': '0'
-      },
-      'URLBase': 'http://192.168.1.41:80',
-      'device': {
-        'deviceType': 'urn:schemas-upnp-org:device:Basic:1',
-        'friendlyName': 'I am a light controller',
-        'manufacturer': 'Royal Philips Electronics',
-        'manufacturerURL': 'http://www.philips.com',
-        'modelDescription': 'Philips hue Personal Wireless Lighting',
-        'modelName': 'Philips hue bridge 2012',
-        'modelNumber': '23409823049823',
-        'modelURL': 'http://www.meethue.com',
-        'serialNumber': 'asd09f8s90832',
-        'UDN': 'uuid:2f402f80-da50-12321-9b23-2131298129',
-        'presentationURL': 'index.html'
-      }
-    })
+  details: {
+   '$': {
+      'xmlns': 'urn:schemas-upnp-org:device-1-0'
+    },
+    'specVersion': {
+      'major': '1',
+      'minor': '0'
+    },
+    'URLBase': 'http://192.168.1.41:80',
+    'device': {
+      'deviceType': 'urn:schemas-upnp-org:device:Basic:1',
+      'friendlyName': 'I am a light controller',
+      'manufacturer': 'Royal Philips Electronics',
+      'manufacturerURL': 'http://www.philips.com',
+      'modelDescription': 'Philips hue Personal Wireless Lighting',
+      'modelName': 'Philips hue bridge 2012',
+      'modelNumber': '23409823049823',
+      'modelURL': 'http://www.meethue.com',
+      'serialNumber': 'asd09f8s90832',
+      'UDN': 'uuid:2f402f80-da50-12321-9b23-2131298129',
+      'presentationURL': 'index.html'
+    }
   }
 })
 ```
@@ -250,10 +328,13 @@ bus.on('transport:incoming-message', function (message, remote) {
 })
 ```
 
+Alternatively see [test/fixtures/all.js](test/fixtures/all.js)
+
 ## References
 
- * [diversario/node-ssdp](https://github.com/diversario/node-ssdp)
- * [Xedecimal/node-ssdp](https://www.npmjs.com/package/ssdp) (no longer maintained)
  * [LG SSDP discovery documentation](http://developer.lgappstv.com/TV_HELP/topic/lge.tvsdk.references.book/html/UDAP/UDAP/Discovery.htm)
  * [UPnP overview](http://jan.newmarch.name/internetdevices/upnp/upnp.html)
  * [UPnP device description](http://jan.newmarch.name/internetdevices/upnp/upnp-devices.html)
+ * [UPnP Device Architecture v1.1](http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v1.1.pdf)
+ * [diversario/node-ssdp](https://github.com/diversario/node-ssdp)
+ * [Xedecimal/node-ssdp](https://www.npmjs.com/package/ssdp) (no longer maintained)

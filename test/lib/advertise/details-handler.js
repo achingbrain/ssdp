@@ -22,9 +22,7 @@ describe('lib/advertise/details-handler', function () {
 
   it('should transform object to xml and return', function (done) {
     detailsHandler(function (callback) {
-      callback(null, {
-        foo: 'bar'
-      })
+      callback(null, '<foo>bar</foo>')
     }, {}, {
       writeHead: sinon.stub(),
       end: function (output) {

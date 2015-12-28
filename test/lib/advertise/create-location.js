@@ -18,7 +18,7 @@ describe('lib/advertise/create-location', function () {
 
     createLocation = proxyquire('../../../lib/advertise/create-location', {
       'http': http,
-      '../find-all-interfaces': findAllInterfaces,
+      './find-all-interfaces': findAllInterfaces,
       'freeport': freeport
     })
   })

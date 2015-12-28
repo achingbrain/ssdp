@@ -87,7 +87,7 @@ describe('ssdp', function () {
 
   it('should discover a service once', function (done) {
     bus.on('discover:urn:schemas-upnp-org:device:Basic:1', function (service) {
-      expect(service.foo).to.equal('bar')
+      expect(service.details.foo).to.equal('bar')
       done()
     })
 
@@ -107,7 +107,7 @@ describe('ssdp', function () {
   it('should update a service', function (done) {
     bus.on('discover:urn:schemas-upnp-org:device:Basic:1', function (service) {
       bus.on('update:uuid:2f402f80-da50-11e1-9b23-00178809ea66', function (service) {
-        expect(service.foo).to.equal('bar')
+        expect(service.details.foo).to.equal('bar')
         done()
       })
 
@@ -298,7 +298,7 @@ describe('ssdp', function () {
 
   it('should handle search responses', function (done) {
     bus.on('discover:urn:schemas-upnp-org:device:Basic:1', function (service) {
-      expect(service.foo).to.equal('bar')
+      expect(service.details.foo).to.equal('bar')
       done()
     })
 
@@ -325,7 +325,7 @@ describe('ssdp', function () {
 
     bus.on('discover:urn:schemas-upnp-org:device:Basic:1', function (service) {
       bus.on('update:uuid:2f402f80-da50-11e1-9b23-00178809ea66', function (service) {
-        expect(service.foo).to.equal('bar')
+        expect(service.details.foo).to.equal('bar')
         done()
       })
 
