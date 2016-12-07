@@ -1,15 +1,15 @@
-var describe = require('mocha').describe
-var it = require('mocha').it
-var beforeEach = require('mocha').beforeEach
-var expect = require('chai').expect
-var sinon = require('sinon')
-var proxyquire = require('proxyquire')
+const describe = require('mocha').describe
+const it = require('mocha').it
+const beforeEach = require('mocha').beforeEach
+const expect = require('chai').expect
+const sinon = require('sinon')
+const proxyquire = require('proxyquire')
 
-describe('lib/discover/search-response', function () {
-  var searchResponse
-  var resolveService
+describe('lib/discover/search-response', () => {
+  let searchResponse
+  let resolveService
 
-  beforeEach(function () {
+  beforeEach(() => {
     resolveService = sinon.stub()
 
     searchResponse = proxyquire('../../../lib/discover/search-response', {
@@ -17,7 +17,7 @@ describe('lib/discover/search-response', function () {
     })
   })
 
-  it('should delegate to resolve-service', function () {
+  it('should delegate to resolve-service', () => {
     searchResponse({}, {
       ttl: sinon.stub()
     })

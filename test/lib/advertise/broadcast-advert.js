@@ -1,25 +1,25 @@
-var describe = require('mocha').describe
-var it = require('mocha').it
-var expect = require('chai').expect
-var sinon = require('sinon')
-var broadcastAdvert = require('../../../lib/advertise/broadcast-advert')
+const describe = require('mocha').describe
+const it = require('mocha').it
+const expect = require('chai').expect
+const sinon = require('sinon')
+const broadcastAdvert = require('../../../lib/advertise/broadcast-advert')
 
-describe('lib/advertise/broadcast-advert', function () {
-  it('should broadcast advert', function () {
-    var ssdp = {
+describe('lib/advertise/broadcast-advert', () => {
+  it('should broadcast advert', () => {
+    const ssdp = {
       emit: sinon.stub(),
       options: {
         signature: 'signature'
       }
     }
-    var advert = {
+    const advert = {
       usn: 'usn',
       location: {
         'udp4': 'udp4-location'
       },
       ttl: 1000
     }
-    var notifcationSubType = 'notifcationSubType'
+    const notifcationSubType = 'notifcationSubType'
 
     broadcastAdvert(ssdp, advert, notifcationSubType)
 

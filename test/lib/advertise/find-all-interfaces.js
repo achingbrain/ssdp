@@ -1,16 +1,16 @@
-var describe = require('mocha').describe
-var it = require('mocha').it
-var before = require('mocha').before
-var expect = require('chai').expect
-var sinon = require('sinon')
-var proxyquire = require('proxyquire')
+const describe = require('mocha').describe
+const it = require('mocha').it
+const before = require('mocha').before
+const expect = require('chai').expect
+const sinon = require('sinon')
+const proxyquire = require('proxyquire')
 
-describe('lib/advertise/find-all-interfaces', function () {
-  var findAllInterfaces
-  var os
-  var interfaces
+describe('lib/advertise/find-all-interfaces', () => {
+  let findAllInterfaces
+  let os
+  let interfaces
 
-  before(function () {
+  before(() => {
     os = {
       networkInterfaces: sinon.stub()
     }
@@ -33,22 +33,22 @@ describe('lib/advertise/find-all-interfaces', function () {
     os.networkInterfaces.returns(interfaces)
   })
 
-  it('should include IPv6 interfaces', function () {
-    var found = findAllInterfaces(false, true)
+  it('should include IPv6 interfaces', () => {
+    const found = findAllInterfaces(false, true)
 
     expect(found.length).to.equal(1)
     expect(found[0]).to.equal(interfaces.v6[0])
   })
 
-  it('should include IPv4 interfaces', function () {
-    var found = findAllInterfaces(true, false)
+  it('should include IPv4 interfaces', () => {
+    const found = findAllInterfaces(true, false)
 
     expect(found.length).to.equal(1)
     expect(found[0]).to.equal(interfaces.v4[0])
   })
 
-  it('should include IPv4 and IPv6 interfaces', function () {
-    var found = findAllInterfaces(true, true)
+  it('should include IPv4 and IPv6 interfaces', () => {
+    const found = findAllInterfaces(true, true)
 
     expect(found.length).to.equal(2)
     expect(found[0]).to.equal(interfaces.v6[0])

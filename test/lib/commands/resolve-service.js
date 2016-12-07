@@ -1,16 +1,16 @@
-var describe = require('mocha').describe
-var it = require('mocha').it
-var beforeEach = require('mocha').beforeEach
-var sinon = require('sinon')
-var expect = require('chai').expect
-var proxyquire = require('proxyquire')
+const describe = require('mocha').describe
+const it = require('mocha').it
+const beforeEach = require('mocha').beforeEach
+const sinon = require('sinon')
+const expect = require('chai').expect
+const proxyquire = require('proxyquire')
 
-describe('lib/commands/resolve-service', function () {
-  var resolveService
-  var resolveLocation
-  var cache
+describe('lib/commands/resolve-service', () => {
+  let resolveService
+  let resolveLocation
+  let cache
 
-  beforeEach(function () {
+  beforeEach(() => {
     resolveLocation = sinon.stub()
     cache = {}
 
@@ -20,14 +20,14 @@ describe('lib/commands/resolve-service', function () {
     })
   })
 
-  it('should ignore invalid arguments', function () {
+  it('should ignore invalid arguments', () => {
     resolveService(null)
 
     expect(Object.keys(cache)).to.be.empty
   })
 
-  it('should ignore non-expired advert', function () {
-    var service = {
+  it('should ignore non-expired advert', () => {
+    const service = {
       expires: Date.now() + 10
     }
 
@@ -40,49 +40,66 @@ describe('lib/commands/resolve-service', function () {
     expect(cache['st']['usn']).to.equal(service)
   })
 
-  it('should emit error when resolving location fails', function () {
-    var error = new Error('Urk!')
-    resolveLocation.callsArgWith(1, error)
+  it('should emit error when resolving location fails', done => {
+    const error = new Error('Urk!')
+    resolveLocation.returns(Promise.reject(error))
 
-    var ssdp = {
-      emit: sinon.stub()
+    const ssdp = {
+      emit: (event, arg) => {
+        expect(event).to.equal('error')
+        expect(arg).to.equal(error)
+
+        done()
+      }
     }
 
     resolveService(ssdp, 'usn', 'st', 'location', 'ttl')
-
-    expect(ssdp.emit.calledWith('error', error)).to.be.true
   })
 
-  it('should should not emit update when device details have not changed', function () {
-    resolveLocation.withArgs('location').callsArgWith(1, null, 'details')
+  it('should should not emit update when device details have not changed', done => {
+    resolveLocation.withArgs('location').onFirstCall().returns(Promise.resolve('details'))
+    resolveLocation.withArgs('location').onSecondCall().returns(Promise.resolve('details'))
 
-    var ssdp = {
+    const ssdp = {
       emit: sinon.stub()
     }
 
     resolveService(ssdp, 'usn', 'st', 'location', -1)
 
-    expect(ssdp.emit.calledWith('discover:st')).to.be.true
+    setTimeout(() => {
+      resolveService(ssdp, 'usn', 'st', 'location', -1)
+    }, 100)
 
-    resolveService(ssdp, 'usn', 'st', 'location', -1)
+    setTimeout(() => {
+      expect(resolveLocation.callCount).to.equal(2)
+      expect(ssdp.emit.callCount).to.equal(1)
+      expect(ssdp.emit.getCall(0).args[0]).to.equal('discover:st')
 
-    expect(ssdp.emit.calledWith('update:usn')).to.be.false
+      done()
+    }, 500)
   })
 
-  it('should should emit update when device details have changed', function () {
-    resolveLocation.withArgs('location').onFirstCall().callsArgWith(1, null, 'details')
-    resolveLocation.withArgs('location').onSecondCall().callsArgWith(1, null, 'details2')
+  it('should should emit update when device details have changed', done => {
+    resolveLocation.withArgs('location').onFirstCall().returns(Promise.resolve('details'))
+    resolveLocation.withArgs('location').onSecondCall().returns(Promise.resolve('details2'))
 
-    var ssdp = {
+    const ssdp = {
       emit: sinon.stub()
     }
 
     resolveService(ssdp, 'usn', 'st', 'location', -1)
 
-    expect(ssdp.emit.calledWith('discover:st')).to.be.true
+    setTimeout(() => {
+      resolveService(ssdp, 'usn', 'st', 'location', -1)
+    }, 100)
 
-    resolveService(ssdp, 'usn', 'st', 'location', -1)
+    setTimeout(() => {
+      expect(resolveLocation.callCount).to.equal(2)
+      expect(ssdp.emit.callCount).to.equal(2)
+      expect(ssdp.emit.getCall(0).args[0]).to.equal('discover:st')
+      expect(ssdp.emit.getCall(1).args[0]).to.equal('update:usn')
 
-    expect(ssdp.emit.calledWith('update:usn')).to.be.true
+      done()
+    }, 500)
   })
 })

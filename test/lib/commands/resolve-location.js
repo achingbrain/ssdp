@@ -1,57 +1,68 @@
-var describe = require('mocha').describe
-var it = require('mocha').it
-var beforeEach = require('mocha').beforeEach
-var sinon = require('sinon')
-var expect = require('chai').expect
-var proxyquire = require('proxyquire')
+const describe = require('mocha').describe
+const it = require('mocha').it
+const beforeEach = require('mocha').beforeEach
+const sinon = require('sinon')
+const expect = require('chai').expect
+const proxyquire = require('proxyquire')
 
-describe('lib/commands/resolve-service', function () {
-  var resolveLocation
-  var Wreck
+describe('lib/commands/resolve-location', () => {
+  let resolveLocation
+  let axios
 
-  beforeEach(function () {
-    Wreck = {
-      get: sinon.stub()
-    }
+  beforeEach(() => {
+    axios = sinon.stub()
 
     resolveLocation = proxyquire('../../../lib/commands/resolve-location', {
-      'wreck': Wreck
+      'axios': axios
     })
   })
 
-  it('should parse location contents as xml', function (done) {
-    var location = 'location'
-    var result = {
+  it('should parse location contents as xml', () => {
+    const location = 'location'
+    const result = {
       headers: {
         'content-type': 'application/xml'
-      }
+      },
+      data: '<foo>bar</foo>'
     }
-    var payload = '<foo>bar</foo>'
 
-    Wreck.get.withArgs(location).callsArgWith(2, null, result, payload)
+    axios.withArgs({
+      url: `http://${location}`,
+      responseType: 'text',
+      headers: {
+        accept: 'application/xml'
+      }
+    })
+    .returns(Promise.resolve(result))
 
-    resolveLocation(location, function (error, location) {
-      expect(error).to.not.exist
+    return resolveLocation(location)
+    .then(location => {
       expect(location).to.deep.equal({
         foo: 'bar'
       })
-      done()
     })
   })
 
-  it('should parse location contents as xml', function (done) {
-    var location = 'location'
-    var result = {
+  it('should parse location contents as xml with attributes', () => {
+    const location = 'location'
+    const result = {
       headers: {
         'content-type': 'application/xml'
-      }
+      },
+      data: '<foo baz="qux">bar</foo>'
     }
-    var payload = '<foo baz="qux">bar</foo>'
 
-    Wreck.get.withArgs(location).callsArgWith(2, null, result, payload)
+    axios.withArgs({
+      url: `http://${location}`,
+      responseType: 'text',
+      headers: {
+        accept: 'application/xml'
+      }
+    })
+    .returns(Promise.resolve(result))
 
-    resolveLocation(location, function (error, location) {
-      expect(error).to.not.exist
+    return resolveLocation(location)
+    .then(location => {
       expect(location).to.deep.equal({
         foo: {
           $: {
@@ -60,23 +71,61 @@ describe('lib/commands/resolve-service', function () {
           _: 'bar'
         }
       })
+    })
+  })
+
+  it('should return error when fetching location fails', done => {
+    const location = 'location'
+    const result = {
+      headers: {
+        'content-type': 'text/html'
+      },
+      data: '<foo>bar</foo>'
+    }
+
+    axios.withArgs({
+      url: `http://${location}`,
+      responseType: 'text',
+      headers: {
+        accept: 'application/xml'
+      }
+    })
+    .returns(Promise.resolve(result))
+
+    resolveLocation(location)
+    .catch(error => {
+      expect(error.message).to.contain('Bad content type')
+
       done()
     })
   })
 
-  it('should return error when fetching location fails', function (done) {
-    var location = 'location'
-    var result = {
+  it('should return error when parsing XML fails', done => {
+    const location = 'location'
+    const result = {
       headers: {
-        'content-type': 'text/html'
-      }
+        'content-type': 'application/xml'
+      },
+      data: '<foo>bar</foos>'
     }
-    var payload = '<foo>bar</foo>'
 
-    Wreck.get.withArgs(location).callsArgWith(2, null, result, payload)
+    axios.withArgs({
+      url: `http://${location}`,
+      responseType: 'text',
+      headers: {
+        accept: 'application/xml'
+      }
+    })
+    .returns(Promise.resolve(result))
 
-    resolveLocation(location, function (error, location) {
-      expect(error.message).to.contain('Bad content type')
+    resolveLocation(location)
+    .then((res) => {
+      console.info('eerm', res)
+      done()
+    })
+    .catch(error => {
+      expect(error.message).to.contain('Unexpected close tag')
+
       done()
     })
   })

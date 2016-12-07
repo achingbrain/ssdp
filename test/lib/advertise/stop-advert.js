@@ -1,12 +1,12 @@
-var describe = require('mocha').describe
-var it = require('mocha').it
-var expect = require('chai').expect
-var sinon = require('sinon')
-var stopAdvert = require('../../../lib/advertise/stop-advert')
+const describe = require('mocha').describe
+const it = require('mocha').it
+const expect = require('chai').expect
+const sinon = require('sinon')
+const stopAdvert = require('../../../lib/advertise/stop-advert')
 
-describe('lib/advertise/stop-advert', function () {
-  it('should stop an advert', function (done) {
-    var ssdp = {
+describe('lib/advertise/stop-advert', () => {
+  it('should stop an advert', () => {
+    const ssdp = {
       emit: sinon.stub(),
       sockets: [{
         options: {
@@ -19,36 +19,31 @@ describe('lib/advertise/stop-advert', function () {
         signature: 'foo'
       }
     }
-    var shutDownServers = [
-      sinon.stub().callsArgAsync(0)
-    ]
-    var advert = {
+    const shutDownServers = sinon.stub().returns([
+      Promise.resolve()
+    ])
+    const advert = {
       location: {
         udp4: 'udp4-location'
       }
     }
 
-    stopAdvert(ssdp, {
+    return stopAdvert(ssdp, {
       shutDownServers: shutDownServers
-    }, advert, function (error) {
-      expect(error).to.not.exist
-      done()
-    })
+    }, advert)
   })
 
-  it('should pass back error when stopping advert', function (done) {
-    var error = new Error('Urk!')
-    var ssdp = {}
-    var shutDownServers = [
-      sinon.stub().callsArgWithAsync(0, error)
-    ]
+  it('should pass back error when stopping advert', () => {
+    const error = new Error('Urk!')
+    const ssdp = {}
+    const shutDownServers = sinon.stub().returns([
+      Promise.reject(error)
+    ])
     var advert = {}
 
-    stopAdvert(ssdp, {
+    return stopAdvert(ssdp, {
       shutDownServers: shutDownServers
-    }, advert, function (err) {
-      expect(err).to.equal(error)
-      done()
-    })
+    }, advert)
+    .catch(err => expect(err).to.equal(error))
   })
 })

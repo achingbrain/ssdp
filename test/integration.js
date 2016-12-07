@@ -5,34 +5,30 @@ var afterEach = require('mocha').afterEach
 var sinon = require('sinon')
 var expect = require('chai').expect
 var ssdp = require('../')
-var freeport = require('freeport')
+var freeport = require('freeport-promise')
 var http = require('http')
-var async = require('async')
 var xml2js = require('xml2js')
 var cache = require('../lib/cache')
 var adverts = require('../lib/adverts')
 var _ = require('lodash')
 
-describe('ssdp', function () {
+describe('ssdp', () => {
   var bus
   var detailsServer
   var details
   var detailsLocation
   var clock
 
-  beforeEach(function (done) {
+  beforeEach(() => {
     clock = sinon.useFakeTimers()
     details = {
       foo: 'bar'
     }
 
-    async.parallel([
-      function (callback) {
-        freeport(function (error, port) {
-          if (error) {
-            return callback(error)
-          }
-
+    return Promise.all([
+      freeport()
+      .then((port) => {
+        return new Promise((resolve, reject) => {
           bus = ssdp({
             sockets: [{
               broadcast: {
@@ -43,17 +39,13 @@ describe('ssdp', function () {
               }
             }]
           })
-          bus.on('ready', function () {
-            callback()
-          })
+          bus.on('ready', () => resolve())
+          bus.on('error', () => reject())
         })
-      },
-      function (callback) {
-        freeport(function (error, port) {
-          if (error) {
-            return done(error)
-          }
-
+      }),
+      freeport()
+      .then((port) => {
+        return new Promise((resolve, reject) => {
           detailsLocation = 'http://localhost:' + port
 
           detailsServer = http.createServer(function (request, response) {
@@ -63,29 +55,34 @@ describe('ssdp', function () {
             response.writeHead(200, {'Content-Type': 'text/xml'})
             response.end(xml)
           })
-          detailsServer.listen(port, callback)
+          detailsServer.listen(port, (error) => {
+            if (error) {
+              return reject(error)
+            }
+
+            resolve()
+          })
         })
-      }
-    ], done)
+      })
+    ])
   })
 
-  afterEach(function (done) {
+  afterEach(() => {
     clock.restore()
 
-    async.parallel([
-      bus.stop.bind(bus),
-      detailsServer.close.bind(detailsServer),
-      function (next) {
-        adverts.splice(0, adverts.length)
-        for (var key in cache) {
-          delete cache[key]
-        }
-        next()
+    return Promise.all([
+      bus.stop(),
+      detailsServer.close()
+    ])
+    .then(() => {
+      adverts.splice(0, adverts.length)
+      for (var key in cache) {
+        delete cache[key]
       }
-    ], done)
+    })
   })
 
-  it('should discover a service once', function (done) {
+  it('should discover a service once', done => {
     bus.on('discover:urn:schemas-upnp-org:device:Basic:1', function (service) {
       expect(service.details.foo).to.equal('bar')
       done()
@@ -104,7 +101,7 @@ describe('ssdp', function () {
     bus.emit('transport:incoming-message', new Buffer(message), {address: 'test', port: 'test'})
   })
 
-  it('should update a service', function (done) {
+  it('should update a service', done => {
     bus.on('discover:urn:schemas-upnp-org:device:Basic:1', function (service) {
       bus.on('update:uuid:2f402f80-da50-11e1-9b23-00178809ea66', function (service) {
         expect(service.details.foo).to.equal('bar')
@@ -132,7 +129,7 @@ describe('ssdp', function () {
     bus.emit('transport:incoming-message', new Buffer(message), {address: 'test', port: 'test'})
   })
 
-  it('should advertise a service', function (done) {
+  it('should advertise a service', done => {
     var usn = 'my-service-type'
 
     var didByeBye
@@ -172,12 +169,25 @@ describe('ssdp', function () {
     })
   })
 
-  it('should respond to searches for an advertised service', function (done) {
+  it('should respond to searches for an advertised service', done => {
     var usn = 'my-service-type'
     var searcher = {
       port: 39823,
       address: '0.0.0.0'
     }
+
+    bus.on('transport:outgoing-message', (socket, message, remote) => {
+      message = message.toString('utf8')
+
+      if (_.startsWith(message, 'HTTP/1.1 200 OK')) {
+        expect(message).to.contain('USN: ' + bus.udn + '::my-service-type')
+        expect(message).to.contain('ST: my-service-type')
+        expect(message).to.contain('LOCATION: http://')
+        expect(remote).to.deep.equal(searcher)
+
+        done()
+      }
+    })
 
     bus.advertise({
       usn: usn,
@@ -192,38 +202,38 @@ describe('ssdp', function () {
           }
         })
       }
-    }, function (error, advert) {
-      expect(error).to.not.exist
-
+    })
+    .then(advert => {
       var message = 'M-SEARCH * HTTP/1.1\r\n' +
         'HOST: 239.255.255.250:1900\r\n' +
         'ST: ' + usn + '\r\n' +
         'MAN: ssdp:discover\r\n' +
         'MX: 0'
 
-      bus.on('transport:outgoing-message', function (socket, message, remote) {
-        message = message.toString('utf8')
-
-        if (_.startsWith(message, 'HTTP/1.1 200 OK')) {
-          expect(message).to.contain('USN: ' + bus.udn + '::my-service-type')
-          expect(message).to.contain('ST: my-service-type')
-          expect(message).to.contain('LOCATION: http://')
-          expect(remote).to.deep.equal(searcher)
-
-          done()
-        }
-      })
-
       bus.emit('transport:incoming-message', new Buffer(message), searcher)
     })
+    .catch(error => done(error))
   })
 
-  it('should respond to global searches', function (done) {
+  it('should respond to global searches', done => {
     var usn = 'my-service-type'
     var searcher = {
       port: 39823,
       address: '0.0.0.0'
     }
+
+    bus.on('transport:outgoing-message', (socket, message, remote) => {
+      message = message.toString('utf8')
+
+      if (_.startsWith(message, 'HTTP/1.1 200 OK')) {
+        expect(message).to.contain('USN: ' + bus.udn + '::my-service-type')
+        expect(message).to.contain('ST: my-service-type')
+        expect(message).to.contain('LOCATION: http://')
+        expect(remote).to.deep.equal(searcher)
+
+        done()
+      }
+    })
 
     bus.advertise({
       usn: usn,
@@ -238,36 +248,23 @@ describe('ssdp', function () {
           }
         })
       }
-    }, function (error, advert) {
-      expect(error).to.not.exist
-
+    })
+    .then(advert => {
       var message = 'M-SEARCH * HTTP/1.1\r\n' +
         'HOST: 239.255.255.250:1900\r\n' +
         'ST: ssdp:all\r\n' +
         'MAN: ssdp:discover\r\n' +
         'MX: 0'
 
-      bus.on('transport:outgoing-message', function (socket, message, remote) {
-        message = message.toString('utf8')
-
-        if (_.startsWith(message, 'HTTP/1.1 200 OK')) {
-          expect(message).to.contain('USN: ' + bus.udn + '::my-service-type')
-          expect(message).to.contain('ST: my-service-type')
-          expect(message).to.contain('LOCATION: http://')
-          expect(remote).to.deep.equal(searcher)
-
-          done()
-        }
-      })
-
       bus.emit('transport:incoming-message', new Buffer(message), searcher)
     })
+    .catch(error => done(error))
   })
 
-  it('should search for services', function (done) {
+  it('should search for services', done => {
     var usn = 'my-service-type'
 
-    bus.on('transport:outgoing-message', function (socket, message, remote) {
+    bus.on('transport:outgoing-message', (socket, message, remote) => {
       message = message.toString('utf8')
 
       if (_.startsWith(message, 'M-SEARCH * HTTP/1.1')) {
@@ -281,7 +278,7 @@ describe('ssdp', function () {
     bus.discover(usn)
   })
 
-  it('should search for all services', function (done) {
+  it('should search for all services', done => {
     bus.on('transport:outgoing-message', function (socket, message, remote) {
       message = message.toString('utf8')
 
@@ -296,7 +293,7 @@ describe('ssdp', function () {
     bus.discover()
   })
 
-  it('should handle search responses', function (done) {
+  it('should handle search responses', done => {
     bus.on('discover:urn:schemas-upnp-org:device:Basic:1', function (service) {
       expect(service.details.foo).to.equal('bar')
       done()
@@ -314,7 +311,7 @@ describe('ssdp', function () {
     bus.emit('transport:incoming-message', new Buffer(message), {address: 'test', port: 'test'})
   })
 
-  it('should handle search responses updating cached services', function (done) {
+  it('should handle search responses updating cached services', done => {
     var message = 'HTTP/1.1 200 OK\r\n' +
       'CACHE-CONTROL: max-age=100\r\n' +
       'EXT:\r\n' +

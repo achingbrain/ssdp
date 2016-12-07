@@ -1,15 +1,15 @@
-var describe = require('mocha').describe
-var it = require('mocha').it
-var beforeEach = require('mocha').beforeEach
-var sinon = require('sinon')
-var expect = require('chai').expect
-var proxyquire = require('proxyquire')
+const describe = require('mocha').describe
+const it = require('mocha').it
+const beforeEach = require('mocha').beforeEach
+const sinon = require('sinon')
+const expect = require('chai').expect
+const proxyquire = require('proxyquire')
 
-describe('lib/commands/search', function () {
-  var search
-  var adverts
+describe('lib/commands/search', () => {
+  let search
+  let adverts
 
-  beforeEach(function () {
+  beforeEach(() => {
     adverts = []
 
     search = proxyquire('../../../lib/commands/search', {
@@ -17,11 +17,11 @@ describe('lib/commands/search', function () {
     })
   })
 
-  it('should reject invalid messages', function () {
-    var ssdp = {
+  it('should reject invalid messages', () => {
+    const ssdp = {
       emit: sinon.stub()
     }
-    var message = {
+    const message = {
       headers: {
 
       }
@@ -32,24 +32,24 @@ describe('lib/commands/search', function () {
     expect(ssdp.emit.called).to.be.false
   })
 
-  it('should respond to a global search', function () {
-    var ssdp = {
+  it('should respond to a global search', () => {
+    const ssdp = {
       udn: 'udn',
       emit: sinon.stub(),
       options: {
         signature: 'signature'
       }
     }
-    var message = {
+    const message = {
       MAN: 'man',
       MX: 'usn',
       ST: 'ssdp:all'
     }
-    var remote = {
+    const remote = {
       address: 'remote-address',
       port: 'remote-port'
     }
-    var advert = {
+    const advert = {
       service: {
         usn: 'usn',
         ttl: 1800,
@@ -72,8 +72,8 @@ describe('lib/commands/search', function () {
     expect(ssdp.emit.getCall(0).args[3]).to.deep.equal(remote)
   })
 
-  it('should respond to a search', function () {
-    var ssdp = {
+  it('should respond to a search', () => {
+    const ssdp = {
       udn: 'udn',
       sockets: [{
         type: 'udp4'
@@ -83,12 +83,12 @@ describe('lib/commands/search', function () {
         signature: 'signature'
       }
     }
-    var message = {
+    const message = {
       MAN: 'man',
       MX: 0,
       ST: 'usn'
     }
-    var remote = {
+    const remote = {
       address: 'remote-address',
       port: 'remote-port'
     }
@@ -110,8 +110,8 @@ describe('lib/commands/search', function () {
     expect(ssdp.emit.calledOnce).to.be.true
   })
 
-  it('should respond to a search in a case insensitive manner', function () {
-    var ssdp = {
+  it('should respond to a search in a case insensitive manner', () => {
+    const ssdp = {
       udn: 'udn',
       sockets: [{
         type: 'udp4'
@@ -121,12 +121,12 @@ describe('lib/commands/search', function () {
         signature: 'signature'
       }
     }
-    var message = {
+    const message = {
       MAN: 'man',
       MX: 0,
       ST: 'USN'
     }
-    var remote = {
+    const remote = {
       address: 'remote-address',
       port: 'remote-port'
     }

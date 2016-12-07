@@ -1,32 +1,33 @@
-var describe = require('mocha').describe
-var it = require('mocha').it
-var expect = require('chai').expect
-var sinon = require('sinon')
-var detailsHandler = require('../../../lib/advertise/details-handler')
+const describe = require('mocha').describe
+const it = require('mocha').it
+const expect = require('chai').expect
+const sinon = require('sinon')
+const detailsHandler = require('../../../lib/advertise/details-handler')
 
-describe('lib/advertise/details-handler', function () {
-  it('should return error when creating details fails', function (done) {
-    var error = new Error('Urk!')
+describe('lib/advertise/details-handler', () => {
+  it('should return error when creating details fails', done => {
+    const error = new Error('Urk!')
+    const createDetails = sinon.stub().returns(Promise.reject(error))
+    const writeHead = sinon.stub()
 
-    detailsHandler(function (callback) {
-      callback(error)
-    }, {}, {
-      writeHead: sinon.stub(),
-      end: function (output) {
-        expect(this.writeHead.calledWith(500)).to.be.true
+    detailsHandler(createDetails, {}, {
+      writeHead: writeHead,
+      end: (output) => {
+        expect(writeHead.calledWith(500)).to.be.true
         expect(output).to.equal(error)
         done()
       }
     })
   })
 
-  it('should transform object to xml and return', function (done) {
-    detailsHandler(function (callback) {
-      callback(null, '<foo>bar</foo>')
-    }, {}, {
-      writeHead: sinon.stub(),
-      end: function (output) {
-        expect(this.writeHead.calledWith(200)).to.be.true
+  it('should transform object to xml and return', done => {
+    const createDetails = sinon.stub().returns(Promise.resolve('<foo>bar</foo>'))
+    const writeHead = sinon.stub()
+
+    detailsHandler(createDetails, {}, {
+      writeHead: writeHead,
+      end: (output) => {
+        expect(writeHead.calledWith(200)).to.be.true
         expect(output).to.contain('<foo>bar</foo>')
         done()
       }

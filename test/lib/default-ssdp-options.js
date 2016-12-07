@@ -1,11 +1,11 @@
-var describe = require('mocha').describe
-var it = require('mocha').it
-var expect = require('chai').expect
-var defaultSsdpOptions = require('../../lib/default-ssdp-options')
+const describe = require('mocha').describe
+const it = require('mocha').it
+const expect = require('chai').expect
+const defaultSsdpOptions = require('../../lib/default-ssdp-options')
 
-describe('lib/default-ssdp-options', function () {
-  it('should populate defaults', function () {
-    var options = defaultSsdpOptions({})
+describe('lib/default-ssdp-options', () => {
+  it('should populate defaults', () => {
+    const options = defaultSsdpOptions({})
 
     expect(options.udn).to.be.ok
     expect(options.sockets.length).to.equal(1)
@@ -16,8 +16,8 @@ describe('lib/default-ssdp-options', function () {
     expect(options.sockets[0].maxHops).to.equal(4)
   })
 
-  it('should honor weird half-set socket', function () {
-    var options = defaultSsdpOptions({
+  it('should honor weird half-set socket', () => {
+    const options = defaultSsdpOptions({
       sockets: [{
         type: 'udp5',
         broadcast: {
@@ -36,8 +36,8 @@ describe('lib/default-ssdp-options', function () {
     expect(options.sockets[0].maxHops).to.equal(4)
   })
 
-  it('should survive no arguments', function () {
-    var options = defaultSsdpOptions()
+  it('should survive no arguments', () => {
+    const options = defaultSsdpOptions()
 
     expect(options.udn).to.be.ok
     expect(options.sockets.length).to.equal(1)

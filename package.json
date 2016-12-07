@@ -29,23 +29,22 @@
     "chai": "^3.0.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.4.1",
-    "mocha": "^2.2.5",
+    "mocha": "^3.2.0",
     "pre-commit": "^1.0.10",
     "proxyquire": "^1.6.0",
     "sinon": "^1.15.4",
-    "standard": "^6.0.7"
+    "standard": "^8.6.0"
   },
   "pre-commit": [
     "lint",
     "test:coverage:check"
   ],
   "dependencies": {
-    "async": "^1.3.0",
-    "freeport": "^1.0.5",
+    "axios": "^0.15.3",
+    "freeport-promise": "^1.1.0",
     "lodash": "^4.5.1",
-    "uuid": "^2.0.1",
+    "uuid": "^3.0.1",
     "wildemitter": "^1.1.0",
-    "wreck": "^7.0.0",
     "xml2js": "^0.4.9"
   }
 }

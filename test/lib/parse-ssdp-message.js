@@ -1,29 +1,29 @@
-var describe = require('mocha').describe
-var it = require('mocha').it
-var expect = require('chai').expect
-var sinon = require('sinon')
-var parse = require('../../lib/parse-ssdp-message')
-var proxyquire = require('proxyquire')
+const describe = require('mocha').describe
+const it = require('mocha').it
+const expect = require('chai').expect
+const sinon = require('sinon')
+const parse = require('../../lib/parse-ssdp-message')
+const proxyquire = require('proxyquire')
 
-describe('lib/parse-ssdp-message', function () {
-  it('should parse search request', function () {
-    var type = 'M-SEARCH'
-    var host = '239.255.255.250:1900'
-    var serviceType = 'urn:schemas-upnp-org:device:InternetGatewayDevice:1'
-    var action = 'ssdp:discover'
-    var mx = 3
+describe('lib/parse-ssdp-message', () => {
+  it('should parse search request', () => {
+    const type = 'M-SEARCH'
+    const host = '239.255.255.250:1900'
+    const serviceType = 'urn:schemas-upnp-org:device:InternetGatewayDevice:1'
+    const action = 'ssdp:discover'
+    const mx = 3
 
-    var message = type + ' * HTTP/1.1\r\n' +
+    const message = type + ' * HTTP/1.1\r\n' +
       'Host: ' + host + '\n' +
       'ST: ' + serviceType + ' \r\n' +
       'Man :" ' + action + '"\r\n' +
       'MX: ' + mx
 
-    var ssdp = {
+    const ssdp = {
       emit: sinon.stub()
     }
 
-    var remoteInfo = {}
+    const remoteInfo = {}
 
     parse(ssdp, message, remoteInfo)
 
@@ -35,20 +35,20 @@ describe('lib/parse-ssdp-message', function () {
     expect(ssdp.emit.getCall(0).args[1].MX).to.equal(mx)
   })
 
-  it('should parse a notify request', function () {
-    var type = 'NOTIFY'
-    var host = '239.255.255.250:1900'
-    var notificationType = 'urn:schemas-upnp-org:device:MediaRenderer:1'
-    var notificatonSubtype = 'ssdp:alive'
-    var location = 'http://10.1.83.59:2869/upnphost/udhisapi.dll?content=uuid:600852a0-3651-4f30-b314-cf367c02a864'
-    var usn = 'uuid:600852a0-3651-4f30-b314-cf367c02a864::urn:schemas-upnp-org:device:MediaRenderer:1'
-    var maxAge = 1800
-    var cacheControl = 'max-age=' + maxAge
-    var server = 'Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0'
-    var opt = '"http://schemas.upnp.org/upnp/1/0/"; ns=01'
-    var nls = '4c7e818231dc16d5311f21cf2c8559a1'
+  it('should parse a notify request', () => {
+    const type = 'NOTIFY'
+    const host = '239.255.255.250:1900'
+    const notificationType = 'urn:schemas-upnp-org:device:MediaRenderer:1'
+    const notificatonSubtype = 'ssdp:alive'
+    const location = 'http://10.1.83.59:2869/upnphost/udhisapi.dll?content=uuid:600852a0-3651-4f30-b314-cf367c02a864'
+    const usn = 'uuid:600852a0-3651-4f30-b314-cf367c02a864::urn:schemas-upnp-org:device:MediaRenderer:1'
+    const maxAge = 1800
+    const cacheControl = 'max-age=' + maxAge
+    const server = 'Microsoft-Windows-NT/5.1 UPnP/1.0 UPnP-Device-Host/1.0'
+    const opt = '"http://schemas.upnp.org/upnp/1/0/"; ns=01'
+    const nls = '4c7e818231dc16d5311f21cf2c8559a1'
 
-    var message = type + ' * HTTP/1.1\r\n' +
+    const message = type + ' * HTTP/1.1\r\n' +
      'Host: ' + host + '\r\n' +
      'NT: ' + notificationType + '\r\n' +
      'NTS: ' + notificatonSubtype + '\r\n' +
@@ -59,11 +59,11 @@ describe('lib/parse-ssdp-message', function () {
      'OPT: ' + opt + '\r\n' +
      '01-NLS: ' + nls
 
-    var ssdp = {
+    const ssdp = {
       emit: sinon.stub()
     }
 
-    var remoteInfo = {}
+    const remoteInfo = {}
 
     parse(ssdp, message, remoteInfo)
 
@@ -82,15 +82,15 @@ describe('lib/parse-ssdp-message', function () {
     expect(ssdp.emit.getCall(0).args[1].remote()).to.equal(remoteInfo)
   })
 
-  it('should parse a search response', function () {
-    var maxAge = 100
-    var cacheControl = 'max-age=' + maxAge
-    var location = 'http://192.168.1.76:80/description.xml'
-    var server = 'FreeRTOS/7.4.2 UPnP/1.0 IpBridge/1.8.0'
-    var serviceType = 'upnp:rootdevice'
-    var usn = 'uuid:2f402f80-da50-11e1-9b23-00178809ea66::upnp:rootdevice'
+  it('should parse a search response', () => {
+    const maxAge = 100
+    const cacheControl = 'max-age=' + maxAge
+    const location = 'http://192.168.1.76:80/description.xml'
+    const server = 'FreeRTOS/7.4.2 UPnP/1.0 IpBridge/1.8.0'
+    const serviceType = 'upnp:rootdevice'
+    const usn = 'uuid:2f402f80-da50-11e1-9b23-00178809ea66::upnp:rootdevice'
 
-    var message = 'HTTP/1.1 200 OK\r\n' +
+    const message = 'HTTP/1.1 200 OK\r\n' +
       'CACHE-CONTROL: ' + cacheControl + '\r\n' +
       'EXT:\r\n' +
       'LOCATION: ' + location + '\r\n' +
@@ -98,11 +98,11 @@ describe('lib/parse-ssdp-message', function () {
       'ST: ' + serviceType + '\r\n' +
       'USN: ' + usn
 
-    var ssdp = {
+    const ssdp = {
       emit: sinon.stub()
     }
 
-    var remoteInfo = {}
+    const remoteInfo = {}
 
     parse(ssdp, message, remoteInfo)
 
@@ -116,19 +116,19 @@ describe('lib/parse-ssdp-message', function () {
     expect(ssdp.emit.getCall(0).args[1].ST).to.equal(serviceType)
   })
 
-  it('should reply to messages from same host but different port', function () {
-    var findAllInterfaces = sinon.stub()
+  it('should reply to messages from same host but different port', () => {
+    const findAllInterfaces = sinon.stub()
     findAllInterfaces.returns([{
       address: '127.0.0.1'
     }, {
       address: '192.168.0.1'
     }])
 
-    parse = proxyquire('../../lib/parse-ssdp-message', {
+    const parse = proxyquire('../../lib/parse-ssdp-message', {
       './find-all-interfaces': findAllInterfaces
     })
 
-    var ssdp = {
+    const ssdp = {
       emit: sinon.stub(),
       sockets: [{
         options: {
@@ -147,8 +147,8 @@ describe('lib/parse-ssdp-message', function () {
     expect(ssdp.emit.called).to.be.true
   })
 
-  it('should ignore messages with unknown type', function () {
-    var ssdp = {
+  it('should ignore messages with unknown type', () => {
+    const ssdp = {
       emit: sinon.stub()
     }
 

@@ -1,11 +1,11 @@
-var describe = require('mocha').describe
-var it = require('mocha').it
-var expect = require('chai').expect
-var defaultSocketOptions = require('../../lib/default-socket-options')
+const describe = require('mocha').describe
+const it = require('mocha').it
+const expect = require('chai').expect
+const defaultSocketOptions = require('../../lib/default-socket-options')
 
-describe('lib/default-socket-options', function () {
-  it('should populate defaults', function () {
-    var socket = defaultSocketOptions({})
+describe('lib/default-socket-options', () => {
+  it('should populate defaults', () => {
+    const socket = defaultSocketOptions({})
 
     expect(socket.type).to.equal('udp4')
     expect(socket.broadcast.address).to.equal('239.255.255.250')
@@ -15,8 +15,8 @@ describe('lib/default-socket-options', function () {
     expect(socket.maxHops).to.equal(4)
   })
 
-  it('should survive no arguments', function () {
-    var socket = defaultSocketOptions()
+  it('should survive no arguments', () => {
+    const socket = defaultSocketOptions()
 
     expect(socket.type).to.equal('udp4')
     expect(socket.broadcast.address).to.equal('239.255.255.250')

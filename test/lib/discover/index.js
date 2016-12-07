@@ -1,15 +1,15 @@
-var describe = require('mocha').describe
-var it = require('mocha').it
-var expect = require('chai').expect
-var sinon = require('sinon')
-var discover = require('../../../lib/discover')
+const describe = require('mocha').describe
+const it = require('mocha').it
+const expect = require('chai').expect
+const sinon = require('sinon')
+const discover = require('../../../lib/discover')
 
-describe('lib/discover', function () {
-  it('should send a search message', function () {
-    var ssdp = {
+describe('lib/discover', () => {
+  it('should send a search message', () => {
+    const ssdp = {
       emit: sinon.stub()
     }
-    var serviceType = 'serviceType'
+    const serviceType = 'serviceType'
 
     discover(ssdp, serviceType)
 
@@ -21,8 +21,8 @@ describe('lib/discover', function () {
     expect(ssdp.emit.getCall(0).args[2].MX).to.equal(0)
   })
 
-  it('should default to global search', function () {
-    var ssdp = {
+  it('should default to global search', () => {
+    const ssdp = {
       emit: sinon.stub()
     }
 
