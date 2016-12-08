@@ -16,7 +16,7 @@ describe('lib', () => {
     discover = sinon.stub()
     adverts = []
 
-    ssdp = proxyquire('../../lib', {
+    ssdp = proxyquire('../../lib/index', {
       './create-sockets': createSockets,
       './discover': discover,
       './adverts': adverts
@@ -24,18 +24,42 @@ describe('lib', () => {
   })
 
   it('should set up methods to be invoked once ready is emitted', done => {
-    createSockets.returns(Promise.resolve([]))
+    createSockets.returns(new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve([])
+      }, 500)
+    }))
+    discover.returns(Promise.resolve())
 
     const bus = ssdp()
     bus.discover()
-
-    expect(discover.called).to.be.false
-
-    bus.once('ready', () => {
+    .then(() => {
       expect(discover.called).to.be.true
 
       done()
     })
+
+    expect(discover.called).to.be.false
+  })
+
+  it('should set up methods to be invoked once ready is emitted even if they error', done => {
+    const error = new Error('Urk!')
+    createSockets.returns(new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve([])
+      }, 500)
+    }))
+    discover.returns(Promise.reject(error))
+
+    const bus = ssdp()
+    bus.discover()
+    .catch(err => {
+      expect(err).to.equal(error)
+
+      done()
+    })
+
+    expect(discover.called).to.be.false
   })
 
   it('should pass back an error when creating sockets fails', done => {
@@ -59,6 +83,7 @@ describe('lib', () => {
       stop: sinon.stub().returns(Promise.resolve())
     })
     createSockets.returns(Promise.resolve(sockets))
+    discover.returns(Promise.resolve())
 
     const bus = ssdp({})
     bus.discover()
