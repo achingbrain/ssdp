@@ -1,3 +1,5 @@
+'use strict'
+
 const describe = require('mocha').describe
 const it = require('mocha').it
 const before = require('mocha').before

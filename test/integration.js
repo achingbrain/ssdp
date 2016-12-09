@@ -1,23 +1,25 @@
-var describe = require('mocha').describe
-var it = require('mocha').it
-var beforeEach = require('mocha').beforeEach
-var afterEach = require('mocha').afterEach
-var sinon = require('sinon')
-var expect = require('chai').expect
-var ssdp = require('../')
-var freeport = require('freeport-promise')
-var http = require('http')
-var xml2js = require('xml2js')
-var cache = require('../lib/cache')
-var adverts = require('../lib/adverts')
-var _ = require('lodash')
+'use strict'
+
+const describe = require('mocha').describe
+const it = require('mocha').it
+const beforeEach = require('mocha').beforeEach
+const afterEach = require('mocha').afterEach
+const sinon = require('sinon')
+const expect = require('chai').expect
+const ssdp = require('../')
+const freeport = require('freeport-promise')
+const http = require('http')
+const xml2js = require('xml2js')
+const cache = require('../lib/cache')
+const adverts = require('../lib/adverts')
+const _ = require('lodash')
 
 describe('ssdp', () => {
-  var bus
-  var detailsServer
-  var details
-  var detailsLocation
-  var clock
+  let bus
+  let detailsServer
+  let details
+  let detailsLocation
+  let clock
 
   beforeEach(() => {
     clock = sinon.useFakeTimers()

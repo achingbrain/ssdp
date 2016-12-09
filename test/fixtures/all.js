@@ -1,7 +1,9 @@
-var ssdp = require('../../')
+'use strict'
+
+const ssdp = require('../../')
 
 module.exports = () => {
-  var bus = ssdp()
+  const bus = ssdp()
   bus.on('error', console.error)
 
   bus.on('transport:outgoing-message', function (socket, message, remote) {
