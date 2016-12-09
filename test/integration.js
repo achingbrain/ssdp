@@ -85,7 +85,7 @@ describe('ssdp', () => {
   })
 
   it('should discover a service once', done => {
-    bus.on('discover:urn:schemas-upnp-org:device:Basic:1', function (service) {
+    bus.on('discover:urn:schemas-upnp-org:device:Basic:1', service => {
       expect(service.details.foo).to.equal('bar')
       done()
     })
@@ -104,8 +104,8 @@ describe('ssdp', () => {
   })
 
   it('should update a service', done => {
-    bus.on('discover:urn:schemas-upnp-org:device:Basic:1', function (service) {
-      bus.on('update:uuid:2f402f80-da50-11e1-9b23-00178809ea66', function (service) {
+    bus.on('discover:urn:schemas-upnp-org:device:Basic:1', service => {
+      bus.on('update:uuid:2f402f80-da50-11e1-9b23-00178809ea66', service => {
         expect(service.details.foo).to.equal('bar')
         done()
       })
@@ -136,7 +136,7 @@ describe('ssdp', () => {
 
     var didByeBye
 
-    bus.on('transport:outgoing-message', function (socket, message, recpient) {
+    bus.on('transport:outgoing-message', (socket, message, recpient) => {
       message = message.toString('utf8')
 
       if (!didByeBye) {
@@ -155,20 +155,17 @@ describe('ssdp', () => {
 
     bus.advertise({
       usn: usn,
-      details: function (callback) {
-        callback(null, {
-          root: {
-            specVersion: {
-              major: 1,
-              minor: 0
-            },
-            URLBase: 'http://example.com'
-          }
-        })
+      details: {
+        root: {
+          specVersion: {
+            major: 1,
+            minor: 0
+          },
+          URLBase: 'http://example.com'
+        }
       }
-    }, function (error, advert) {
-      expect(error).to.not.exist
     })
+    .catch(error => done(error))
   })
 
   it('should respond to searches for an advertised service', done => {
@@ -239,17 +236,15 @@ describe('ssdp', () => {
 
     bus.advertise({
       usn: usn,
-      details: function (callback) {
-        callback(null, {
-          root: {
-            specVersion: {
-              major: 1,
-              minor: 0
-            },
-            URLBase: 'http://example.com'
-          }
-        })
-      }
+      details: Promise.resolve({
+        root: {
+          specVersion: {
+            major: 1,
+            minor: 0
+          },
+          URLBase: 'http://example.com'
+        }
+      })
     })
     .then(advert => {
       var message = 'M-SEARCH * HTTP/1.1\r\n' +
@@ -296,7 +291,7 @@ describe('ssdp', () => {
   })
 
   it('should handle search responses', done => {
-    bus.on('discover:urn:schemas-upnp-org:device:Basic:1', function (service) {
+    bus.on('discover:urn:schemas-upnp-org:device:Basic:1', service => {
       expect(service.details.foo).to.equal('bar')
       done()
     })
@@ -322,8 +317,8 @@ describe('ssdp', () => {
       'SERVER: node.js/0.12.6 UPnP/1.1 @achingbrain/ssdp/0.0.1\r\n' +
       'LOCATION: ' + detailsLocation
 
-    bus.on('discover:urn:schemas-upnp-org:device:Basic:1', function (service) {
-      bus.on('update:uuid:2f402f80-da50-11e1-9b23-00178809ea66', function (service) {
+    bus.on('discover:urn:schemas-upnp-org:device:Basic:1', service => {
+      bus.on('update:uuid:2f402f80-da50-11e1-9b23-00178809ea66', service => {
         expect(service.details.foo).to.equal('bar')
         done()
       })
