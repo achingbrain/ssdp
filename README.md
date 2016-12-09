@@ -68,7 +68,8 @@ bus.advertise({
   details: {
     URLBase: 'https://192.168.0.1:8001'
   }
-}, function (error, advert) {
+})
+.then(advert => {
   // stop advertising a service
   advert.stop()
 })
@@ -90,15 +91,14 @@ bus.advertise({
   details: {
     URLBase: 'https://192.168.0.1:8001'
   }
-}, function (error, advert) {
+})
+.then(advert => {
   server.route({
     method: 'GET',
     path: '/ssdp/details.xml',
-    handler: function (request, reply) {
-      advert.service.details(function (error, details) {
-        reply(error, details)
-          .type('text/xml')
-      })
+    handler: (request, reply) => {
+      reply(advert.service.details())
+        .type('text/xml')
     }
   })
 
@@ -117,16 +117,19 @@ bus.advertise({
   details: {
     URLBase: 'https://192.168.0.1:8001'
   }
-}, function (error, advert) {
-  app.get('/ssdp/details.xml', function (request, response) {
-      advert.service.details(function (error, details) {
-        response.set('Content-Type', 'text/xml')
-        response.send(details)
-      })
-    }
+})
+.then(advert => {
+  app.get('/ssdp/details.xml', (request, response) => {
+    advert.service.details()
+    .then(details => {
+      response.set('Content-Type', 'text/xml')
+      response.send(details)
+    })
+    .catch(error => {
+      response.set('Content-Type', 'text/xml')
+      response.send(error)
+    })
   })
-
-  callback(error, server)
 })
 ```
 
@@ -228,7 +231,8 @@ bus.advertise({
       presentationURL: 'index.html'
     }
   }
-}, function (error, advert) {
+})
+.then(advert => {
   // stop advertising a service
   advert.stop()
 })
