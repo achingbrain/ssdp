@@ -9,13 +9,15 @@ const proxyquire = require('proxyquire')
 
 describe('lib/commands/resolve-location', () => {
   let resolveLocation
-  let axios
+  let fetch
 
   beforeEach(() => {
-    axios = sinon.stub()
+    fetch = sinon.stub()
 
     resolveLocation = proxyquire('../../../lib/commands/resolve-location', {
-      'axios': axios
+      'fetch-ponyfill': sinon.stub().returns({
+        fetch: fetch
+      })
     })
   })
 
@@ -25,12 +27,10 @@ describe('lib/commands/resolve-location', () => {
       headers: {
         'content-type': 'application/xml'
       },
-      data: '<foo>bar</foo>'
+      text: sinon.stub().returns(Promise.resolve('<foo>bar</foo>'))
     }
 
-    axios.withArgs({
-      url: `http://${location}`,
-      responseType: 'text',
+    fetch.withArgs(`http://${location}`, {
       headers: {
         accept: 'application/xml'
       }
@@ -51,12 +51,10 @@ describe('lib/commands/resolve-location', () => {
       headers: {
         'content-type': 'application/xml'
       },
-      data: '<foo baz="qux">bar</foo>'
+      text: sinon.stub().returns(Promise.resolve('<foo baz="qux">bar</foo>'))
     }
 
-    axios.withArgs({
-      url: `http://${location}`,
-      responseType: 'text',
+    fetch.withArgs(`http://${location}`, {
       headers: {
         accept: 'application/xml'
       }
@@ -82,12 +80,10 @@ describe('lib/commands/resolve-location', () => {
       headers: {
         'content-type': 'text/html'
       },
-      data: '<foo>bar</foo>'
+      text: sinon.stub().returns(Promise.resolve('<foo>bar</foo>'))
     }
 
-    axios.withArgs({
-      url: `http://${location}`,
-      responseType: 'text',
+    fetch.withArgs(`http://${location}`, {
       headers: {
         accept: 'application/xml'
       }
@@ -108,12 +104,10 @@ describe('lib/commands/resolve-location', () => {
       headers: {
         'content-type': 'application/xml'
       },
-      data: '<foo>bar</foos>'
+      text: sinon.stub().returns(Promise.resolve('<foo>bar</foos>'))
     }
 
-    axios.withArgs({
-      url: `http://${location}`,
-      responseType: 'text',
+    fetch.withArgs(`http://${location}`, {
       headers: {
         accept: 'application/xml'
       }

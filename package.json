@@ -40,7 +40,7 @@
     "test:coverage:check"
   ],
   "dependencies": {
-    "axios": "^0.15.3",
+    "fetch-ponyfill": "^3.0.2",
     "freeport-promise": "^1.1.0",
     "lodash": "^4.5.1",
     "uuid": "^3.0.1",
