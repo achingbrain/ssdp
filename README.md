@@ -37,14 +37,27 @@ Pass a `usn` to the `discover` method - when services are found events will be e
 var usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
 
 bus.discover(usn)
-bus.on('discover:' + usn, function (service) {
+bus.on('discover:' + usn, service => {
   // receive a notification about a service
 
-  bus.on('update:' + service.UDN, function (service) {
+  bus.on('update:' + service.UDN, service => {
     // receive a notification when that service is updated - nb. this will only happen
     // after the service max-age is reached and if the service's device description
     // document has changed
   })
+})
+```
+
+Alternatively, pass a timeout to the discover method:
+
+```javascript
+// this is the unique service name we are interested in:
+var usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
+var timeout = 1000
+
+bus.discover(usn, timeout)
+.then(services => {
+  console.info(`Found ${services.length} services after ${timeout} ms`)
 })
 ```
 
@@ -54,7 +67,7 @@ Don't pass any options to the `discover` method (n.b. you will also receive prot
 
 ```javascript
 bus.discover()
-bus.on('discover:*', function (service) {
+bus.on('discover:*', service => {
   // receive a notification about all service types
 })
 ```
@@ -138,12 +151,12 @@ bus.advertise({
 `ssdp` opens several ports to communicate with other devices on your network, to shut them down, do something like:
 
 ```javascript
-process.on('SIGINT', function() {
+process.on('SIGINT',() => {
   // stop the server(s) from running - this will also send ssdp:byebye messages for all
   // advertised services however they'll only have been sent once the callback is
   // invoked so it won't work with process.on('exit') as you can only perform synchronous
   // operations there
-  bus.stop(function (error) {
+  bus.stop(error => {
     process.exit(error ? 1 : 0)
   })
 })
@@ -185,10 +198,10 @@ var usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
 // search for one type of service
 bus.discover(usn)
 
-bus.on('discover:' + usn, function (service) {
+bus.on('discover:' + usn, service => {
   // receive a notification when a service of the passed type is discovered
 
-  bus.on('update:' + service.device.UDN, function (service) {
+  bus.on('update:' + service.device.UDN, service => {
     // receive a notification when that service is updated
   })
 })
@@ -196,7 +209,7 @@ bus.on('discover:' + usn, function (service) {
 // search for all types of service
 bus.discover()
 
-bus.on('discover:*', function (service) {
+bus.on('discover:*', service => {
   // receive a notification about all discovered services
 })
 
@@ -322,11 +335,11 @@ The server will be shut down when you call `advert.stop`.
 No problem, try this:
 
 ```javascript
-bus.on('transport:outgoing-message', function (socket, message, remote) {
+bus.on('transport:outgoing-message', (socket, message, remote) => {
   console.info('-> Outgoing to %s:%s via %s', remote.address, remote.port, socket.type)
   console.info(message.toString('utf8'))
 })
-bus.on('transport:incoming-message', function (message, remote) {
+bus.on('transport:incoming-message', (message, remote) => {
   console.info('<- Incoming from %s:%s', remote.address, remote.port)
   console.info(message.toString('utf8'))
 })
