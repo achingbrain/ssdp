@@ -162,7 +162,7 @@ process.on('SIGINT',() => {
 })
 ```
 
-### Full API and options
+### Full API and options
 
 ```javascript
 var ssdp = require('@achingbrain/ssdp')
