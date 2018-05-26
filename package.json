@@ -9,7 +9,7 @@
     "upnp"
   ],
   "license": "ISC",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "author": "Alex Potsides",
   "repository": {
     "type": "git",
@@ -42,7 +42,7 @@
   "dependencies": {
     "fetch-ponyfill": "^3.0.2",
     "freeport-promise": "^1.1.0",
-    "lodash": "^4.5.1",
+    "lodash": "^4.17.10",
     "uuid": "^3.0.1",
     "wildemitter": "^1.1.0",
     "xml2js": "^0.4.9"
