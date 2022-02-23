@@ -1,50 +1,150 @@
 {
   "name": "@achingbrain/ssdp",
-  "description": "Yet another SSDP implementation for node.js",
-  "keywords": [
-    "ssdp",
-    "multicast",
-    "media",
-    "device",
-    "upnp"
-  ],
-  "license": "ISC",
   "version": "2.1.2",
+  "description": "Yet another SSDP implementation for node.js",
   "author": "Alex Potsides",
+  "license": "Apache-2.0 OR MIT",
+  "homepage": "https://github.com/achingbrain/ssdp#readme",
   "repository": {
     "type": "git",
-    "url": "git@github.com:achingbrain/ssdp.git"
+    "url": "git+https://github.com/achingbrain/ssdp.git"
   },
   "bugs": {
     "url": "https://github.com/achingbrain/ssdp/issues"
   },
+  "keywords": [
+    "device",
+    "media",
+    "multicast",
+    "ssdp",
+    "upnp"
+  ],
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.0.0"
+  },
+  "type": "module",
+  "types": "./dist/src/index.d.ts",
+  "files": [
+    "src",
+    "dist/src",
+    "!dist/test",
+    "!**/*.tsbuildinfo"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/src/index.js"
+    }
+  },
+  "eslintConfig": {
+    "extends": "ipfs",
+    "parserOptions": {
+      "sourceType": "module"
+    }
+  },
+  "release": {
+    "branches": [
+      "master"
+    ],
+    "plugins": [
+      [
+        "@semantic-release/commit-analyzer",
+        {
+          "preset": "conventionalcommits",
+          "releaseRules": [
+            {
+              "breaking": true,
+              "release": "major"
+            },
+            {
+              "revert": true,
+              "release": "patch"
+            },
+            {
+              "type": "feat",
+              "release": "minor"
+            },
+            {
+              "type": "fix",
+              "release": "patch"
+            },
+            {
+              "type": "chore",
+              "release": "patch"
+            },
+            {
+              "type": "docs",
+              "release": "patch"
+            },
+            {
+              "type": "test",
+              "release": "patch"
+            },
+            {
+              "scope": "no-release",
+              "release": false
+            }
+          ]
+        }
+      ],
+      [
+        "@semantic-release/release-notes-generator",
+        {
+          "preset": "conventionalcommits",
+          "presetConfig": {
+            "types": [
+              {
+                "type": "feat",
+                "section": "Features"
+              },
+              {
+                "type": "fix",
+                "section": "Bug Fixes"
+              },
+              {
+                "type": "chore",
+                "section": "Trivial Changes"
+              },
+              {
+                "type": "docs",
+                "section": "Trivial Changes"
+              },
+              {
+                "type": "test",
+                "section": "Tests"
+              }
+            ]
+          }
+        }
+      ],
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/github",
+      "@semantic-release/git"
+    ]
+  },
   "scripts": {
-    "lint": "standard",
-    "test": "mocha --recursive --reporter=nyan",
-    "test:coverage": "istanbul --include-all-sources cover _mocha --recursive",
-    "test:coverage:check": "istanbul --include-all-sources cover _mocha --recursive && istanbul check-coverage --statement 100 --branch 100 --function 100",
-    "coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls"
+    "lint": "aegir lint",
+    "dep-check": "aegir dep-check dist/src/**/*.js dist/test/**/*.js",
+    "build": "tsc",
+    "pretest": "npm run build",
+    "test": "aegir test -f ./dist/test/*.js -f ./dist/test/**/*.js",
+    "test:node": "npm run test -- -t node --cov",
+    "test:electron-main": "npm run test -- -t electron-main",
+    "release": "semantic-release"
+  },
+  "dependencies": {
+    "event-iterator": "^2.0.0",
+    "freeport-promise": "^2.0.0",
+    "merge-options": "^3.0.4",
+    "uuid": "^8.3.2",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "chai": "^3.0.0",
-    "coveralls": "^2.11.2",
-    "istanbul": "^0.4.1",
-    "mocha": "^3.2.0",
-    "pre-commit": "^1.0.10",
-    "proxyquire": "^1.6.0",
-    "sinon": "^1.15.4",
-    "standard": "^8.6.0"
-  },
-  "pre-commit": [
-    "lint",
-    "test:coverage:check"
-  ],
-  "dependencies": {
-    "fetch-ponyfill": "^3.0.2",
-    "freeport-promise": "^1.1.0",
-    "lodash": "^4.5.1",
-    "uuid": "^3.0.1",
-    "wildemitter": "^1.1.0",
-    "xml2js": "^0.4.9"
+    "@types/uuid": "^8.3.4",
+    "@types/xml2js": "^0.4.9",
+    "aegir": "^36.1.3",
+    "it-first": "^1.0.7",
+    "sinon": "^13.0.1"
   }
 }
