@@ -1,6 +1,6 @@
 # SSDP
 
-[![Build Status](https://travis-ci.org/achingbrain/ssdp.svg?branch=master)](https://travis-ci.org/achingbrain/ssdp)
+[![Build Status](https://github.com/achingbrain/ssdp/actions/workflows/js-test-and-release.yml/badge.svg?branch=master)](https://github.com/achingbrain/ssdp/actions/workflows/js-test-and-release.yml)
 [![Coverage Status](https://coveralls.io/repos/achingbrain/ssdp/badge.svg?branch=master&service=github)](https://coveralls.io/github/achingbrain/ssdp?branch=master)
 [![Dependency Status](https://david-dm.org/achingbrain/ssdp.svg)](https://david-dm.org/achingbrain/ssdp)
 
@@ -21,8 +21,9 @@ npm install @achingbrain/ssdp
 First, import the module, call the function and set up an error handler:
 
 ```javascript
-var ssdp = require('@achingbrain/ssdp')
-var bus = ssdp()
+import ssdp from '@achingbrain/ssdp'
+
+const bus = await ssdp()
 
 // print error messages to the console
 bus.on('error', console.error)
@@ -34,30 +35,20 @@ Pass a `usn` to the `discover` method - when services are found events will be e
 
 ```javascript
 // this is the unique service name we are interested in:
-var usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
+const usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
 
-bus.discover(usn)
-bus.on('discover:' + usn, service => {
-  // receive a notification about a service
+for await (const service of bus.discover(usn)) {
+  // search for instances of a specific service
+}
 
-  bus.on('update:' + service.UDN, service => {
-    // receive a notification when that service is updated - nb. this will only happen
-    // after the service max-age is reached and if the service's device description
-    // document has changed
-  })
+bus.on('service:discover', service => {
+  // receive a notification about discovery of a service
 })
-```
 
-Alternatively, pass a timeout to the discover method:
-
-```javascript
-// this is the unique service name we are interested in:
-var usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
-var timeout = 1000
-
-bus.discover(usn, timeout)
-.then(services => {
-  console.info(`Found ${services.length} services after ${timeout} ms`)
+bus.on('service:update', service => {
+  // receive a notification when that service is updated - nb. this will only happen
+  // after the service max-age is reached and if the service's device description
+  // document has changed
 })
 ```
 
@@ -66,26 +57,25 @@ bus.discover(usn, timeout)
 Don't pass any options to the `discover` method (n.b. you will also receive protocol related events):
 
 ```javascript
-bus.discover()
-bus.on('discover:*', service => {
+for await (const service of bus.discover()) {
   // receive a notification about all service types
-})
+}
 ```
 
 ### Advertise a service
 
 ```javascript
 // advertise a service
-bus.advertise({
+
+const advert = await bus.advertise({
   usn: 'urn:schemas-upnp-org:service:ContentDirectory:1',
   details: {
     URLBase: 'https://192.168.0.1:8001'
   }
 })
-.then(advert => {
-  // stop advertising a service
-  advert.stop()
-})
+
+// stop advertising a service
+await advert.stop()
 ```
 For full options, see [lib/advertise/parse-options.js](lib/advertise/parse-options.js)
 
@@ -96,7 +86,7 @@ By default when you create an advertisment an HTTP server is created to serve th
 #### Hapi
 
 ```javascript
-bus.advertise({
+const advert = await bus.advertise({
   usn: 'urn:schemas-upnp-org:service:ContentDirectory:1',
   location: {
     udp4: 'http://192.168.0.1:8000/ssdp/details.xml'
@@ -105,24 +95,21 @@ bus.advertise({
     URLBase: 'https://192.168.0.1:8001'
   }
 })
-.then(advert => {
-  server.route({
-    method: 'GET',
-    path: '/ssdp/details.xml',
-    handler: (request, reply) => {
-      reply(advert.service.details())
-        .type('text/xml')
-    }
-  })
 
-  callback(error, server)
+server.route({
+  method: 'GET',
+  path: '/ssdp/details.xml',
+  handler: (request, reply) => {
+    reply(advert.service.details())
+      .type('text/xml')
+  }
 })
 ```
 
 #### Express
 
 ```javascript
-bus.advertise({
+const advert = await bus.advertise({
   usn: 'urn:schemas-upnp-org:service:ContentDirectory:1',
   location: {
     udp4: 'http://192.168.0.1:8000/ssdp/details.xml'
@@ -131,18 +118,17 @@ bus.advertise({
     URLBase: 'https://192.168.0.1:8001'
   }
 })
-.then(advert => {
-  app.get('/ssdp/details.xml', (request, response) => {
-    advert.service.details()
-    .then(details => {
-      response.set('Content-Type', 'text/xml')
-      response.send(details)
-    })
-    .catch(error => {
-      response.set('Content-Type', 'text/xml')
-      response.send(error)
-    })
-  })
+
+app.get('/ssdp/details.xml', async (request, response) => {
+  response.set('Content-Type', 'text/xml')
+
+  try {
+    const details = await advert.service.details()
+    response.send(details)
+  } catch (err) {
+    response.set('Content-Type', 'text/xml')
+    response.send(err)
+  }
 })
 ```
 
@@ -165,7 +151,7 @@ process.on('SIGINT',() => {
 ### Full API and options
 
 ```javascript
-var ssdp = require('@achingbrain/ssdp')
+import ssdp from '@achingbrain/ssdp'
 
 // all arguments are optional
 var bus = ssdp({
@@ -196,25 +182,25 @@ bus.on('error', console.error)
 var usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
 
 // search for one type of service
-bus.discover(usn)
+for await (const service of bus.discover(usn)) {
 
-bus.on('discover:' + usn, service => {
+}
+
+bus.on('service:discover', service => {
   // receive a notification when a service of the passed type is discovered
+})
 
-  bus.on('update:' + service.device.UDN, service => {
-    // receive a notification when that service is updated
-  })
+bus.on('service:update', service => {
+  // receive a notification when that service is updated
 })
 
 // search for all types of service
-bus.discover()
+for await (const service of bus.discover()) {
 
-bus.on('discover:*', service => {
-  // receive a notification about all discovered services
-})
+}
 
 // advertise a service
-bus.advertise({
+const advert = await bus.advertise({
   usn: 'a-usn', // unique service name
   interval: 10000, // how often to broadcast service adverts in ms
   ttl: 1800000, // how long the advert is valid for in ms
@@ -245,10 +231,9 @@ bus.advertise({
     }
   }
 })
-.then(advert => {
-  // stop advertising a service
-  advert.stop()
-})
+
+// stop advertising a service
+advert.stop()
 ```
 
 ### Device description document
