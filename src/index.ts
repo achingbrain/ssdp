@@ -67,6 +67,7 @@ interface SSDPEvents {
 }
 
 export interface DiscoveredService {
+  location: string
   details: Record<string, any>
   expires: number
   ST: string
@@ -152,11 +153,19 @@ class SSDPImpl extends EventEmitter implements SSDP {
 
   async * discover (serviceType?: string) {
     const iterator = new EventIterator<DiscoveredService>(
-      ({ push, stop, fail }) => {
-        this.addListener('service:discover', push)
+      ({ push }) => {
+        const listener = (service: DiscoveredService) => {
+          if (serviceType != null && service.ST !== serviceType) {
+            return
+          }
+
+          push(service)
+        }
+
+        this.addListener('service:discover', listener)
 
         return () => {
-          this.removeListener('service:discover', push)
+          this.removeListener('service:discover', listener)
         }
       }
     )
