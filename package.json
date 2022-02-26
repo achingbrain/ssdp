@@ -1,6 +1,6 @@
 {
   "name": "@achingbrain/ssdp",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Yet another SSDP implementation for node.js",
   "author": "Alex Potsides",
   "license": "Apache-2.0 OR MIT",

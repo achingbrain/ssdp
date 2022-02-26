@@ -1,3 +1,10 @@
+### [3.0.2](https://github.com/achingbrain/ssdp/compare/v3.0.1...v3.0.2) (2022-02-26)
+
+
+### Bug Fixes
+
+* type service details ([#13](https://github.com/achingbrain/ssdp/issues/13)) ([37ce621](https://github.com/achingbrain/ssdp/commit/37ce621e7cb43c45594b9112480e85d50809f7aa))
+
 ### [3.0.1](https://github.com/achingbrain/ssdp/compare/v3.0.0...v3.0.1) (2022-02-26)
 
 
