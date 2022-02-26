@@ -5,7 +5,7 @@ export const broadcastAdvert = (ssdp: SSDP, advert: Advert, notifcationSubType: 
   ssdp.emit('ssdp:send-message', 'NOTIFY * HTTP/1.1', {
     NT: advert.usn,
     NTS: notifcationSubType,
-    USN: `${advert.usn}::${ssdp.udn}`,
+    USN: `${ssdp.udn}::${advert.usn}`,
     'CACHE-CONTROL': `max-age=${Math.round(advert.ttl / 1000)}`,
     SERVER: ssdp.signature,
     LOCATION: advert.location
