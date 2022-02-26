@@ -106,7 +106,7 @@ describe('ssdp', () => {
       bus.emit('transport:incoming-message', Buffer.from(message), { address: 'test', port: 0 })
     })
 
-    var message = 'NOTIFY * HTTP/1.1\r\n' +
+    const message = 'NOTIFY * HTTP/1.1\r\n' +
       'HOST: 239.255.255.250:1900\r\n' +
       'NT: urn:schemas-upnp-org:device:Basic:1\r\n' +
       'NTS: ssdp:alive\r\n' +
