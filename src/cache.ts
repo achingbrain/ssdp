@@ -1,8 +1,8 @@
-import type { DiscoveredService } from './index.js'
+import type { Service } from './index.js'
 
 class Cache {
   // service type => unique service name => service
-  private services: Map<string, Map<string, DiscoveredService>>
+  private services: Map<string, Map<string, Service>>
 
   constructor () {
     this.services = new Map()
@@ -48,7 +48,7 @@ class Cache {
     }
   }
 
-  cacheService (service: DiscoveredService) {
+  cacheService (service: Service) {
     const instances = this.services.get(service.ST) ?? new Map()
     instances.set(service.UDN, service)
 

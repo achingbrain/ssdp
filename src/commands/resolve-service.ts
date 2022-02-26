@@ -14,7 +14,6 @@ export async function resolveService (ssdp: SSDP, usn: string, st: string, locat
   if (service == null) {
     newService = true
     service = {
-      location,
       details: {
         pending: true
       },

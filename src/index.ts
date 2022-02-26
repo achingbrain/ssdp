@@ -59,16 +59,15 @@ interface SSDPEvents {
   'ssdp:notify': (message: NotfiyMessage, from: NetworkAddress) => void
   'ssdp:search-response': (message: SearchMessage, from: NetworkAddress) => void
 
-  'service:discover': (service: DiscoveredService) => void
-  'service:update': (service: DiscoveredService) => void
+  'service:discover': (service: Service) => void
+  'service:update': (service: Service) => void
   'service:remove': (usn: string) => void
 
   'error': (err: Error) => void
 }
 
-export interface DiscoveredService {
-  location: string
-  details: Record<string, any>
+export interface Service<Details = Record<string, any>> {
+  details: Details
   expires: number
   ST: string
   UDN: string
@@ -89,7 +88,7 @@ export interface SSDP {
   stop: () => Promise<void>
 
   advertise: (advert: Advertisment) => Promise<CachedAdvert>
-  discover: (serviceType?: string) => AsyncIterable<DiscoveredService>
+  discover: <Details = Record<string, any>> (serviceType?: string) => AsyncIterable<Service<Details>>
 
   // events
   on: <U extends keyof SSDPEvents>(
@@ -151,10 +150,10 @@ class SSDPImpl extends EventEmitter implements SSDP {
     return await advertise(this, advert)
   }
 
-  async * discover (serviceType?: string) {
-    const iterator = new EventIterator<DiscoveredService>(
+  async * discover <Details = Record<string, any>> (serviceType?: string) {
+    const iterator = new EventIterator<Service<Details>>(
       ({ push }) => {
-        const listener = (service: DiscoveredService) => {
+        const listener = (service: Service<Details>) => {
           if (serviceType != null && service.ST !== serviceType) {
             return
           }
