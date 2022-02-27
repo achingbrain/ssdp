@@ -1,3 +1,10 @@
+### [3.0.3](https://github.com/achingbrain/ssdp/compare/v3.0.2...v3.0.3) (2022-02-27)
+
+
+### Bug Fixes
+
+* add location ([#14](https://github.com/achingbrain/ssdp/issues/14)) ([f9656ca](https://github.com/achingbrain/ssdp/commit/f9656ca91e72cd88cb9856b725e8ffb08dedfcb3))
+
 ### [3.0.2](https://github.com/achingbrain/ssdp/compare/v3.0.1...v3.0.2) (2022-02-26)
 
 
