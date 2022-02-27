@@ -13,7 +13,7 @@ const DEFAULT_SSDP_SIGNATURE = util.format('node.js/%s UPnP/1.1 %s/%s', process.
 
 export function defaultSsdpOptions (options?: Partial<SSDPOptions>): SSDPOptions {
   return mergeOptions(options ?? {}, {
-    udn: `uuid:${v4()}`, // eslint-disable-line @typescript-eslint/restrict-template-expressions
+    usn: `uuid:${v4()}`, // eslint-disable-line @typescript-eslint/restrict-template-expressions
     signature: DEFAULT_SSDP_SIGNATURE,
     sockets: [{}].map(defaultSocketOptions),
     retry: {

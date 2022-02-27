@@ -25,7 +25,7 @@ export interface SSDPSocketOptions {
 }
 
 export interface SSDPOptions {
-  udn: string
+  usn: string
   signature: string
   sockets: SSDPSocketOptions[]
 }
@@ -66,11 +66,12 @@ interface SSDPEvents {
   'error': (err: Error) => void
 }
 
-export interface Service<Details = Record<string, any>> {
-  details: Details
+export interface Service<DeviceDescription = Record<string, any>> {
+  location: URL
+  details: DeviceDescription
   expires: number
-  ST: string
-  UDN: string
+  serviceType: string
+  uniqueServiceName: string
 }
 
 export interface Advertisment {
@@ -79,7 +80,7 @@ export interface Advertisment {
 }
 
 export interface SSDP {
-  udn: string
+  usn: string
   signature: string
   sockets: SSDPSocket[]
   options: SSDPOptions
@@ -106,7 +107,7 @@ export interface SSDP {
 }
 
 class SSDPImpl extends EventEmitter implements SSDP {
-  public udn: string
+  public usn: string
   public signature: string
   public sockets: SSDPSocket[]
   public readonly options: SSDPOptions
@@ -115,7 +116,7 @@ class SSDPImpl extends EventEmitter implements SSDP {
     super()
 
     this.options = defaultSsdpOptions(options)
-    this.udn = this.options.udn
+    this.usn = this.options.usn
     this.signature = this.options.signature
     this.sockets = []
   }
@@ -154,7 +155,7 @@ class SSDPImpl extends EventEmitter implements SSDP {
     const iterator = new EventIterator<Service<Details>>(
       ({ push }) => {
         const listener = (service: Service<Details>) => {
-          if (serviceType != null && service.ST !== serviceType) {
+          if (serviceType != null && service.serviceType !== serviceType) {
             return
           }
 

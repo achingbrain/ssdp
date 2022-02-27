@@ -49,10 +49,10 @@ class Cache {
   }
 
   cacheService (service: Service) {
-    const instances = this.services.get(service.ST) ?? new Map()
-    instances.set(service.UDN, service)
+    const instances = this.services.get(service.serviceType) ?? new Map()
+    instances.set(service.uniqueServiceName, service)
 
-    this.services.set(service.ST, instances)
+    this.services.set(service.serviceType, instances)
   }
 
   clear () {

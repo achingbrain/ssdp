@@ -155,7 +155,7 @@ import ssdp from '@achingbrain/ssdp'
 
 // all arguments are optional
 var bus = ssdp({
-  udn: 'unique-identifier', // defaults to a random UUID
+  usn: 'unique-identifier', // defaults to a random UUID
   // a string to identify the server by
   signature: 'node.js/0.12.6 UPnP/1.1 @achingbrain/ssdp/1.0.0',
   retry {
@@ -226,7 +226,7 @@ const advert = await bus.advertise({
       modelNumber: 'A vendor specific model number',
       modelURL: 'http://example.com',
       serialNumber: 'A device specific serial number',
-      UDN: 'unique-identifier' // should be the same as the bus UDN
+      UDN: 'unique-identifier' // should be the same as the bus USN
       presentationURL: 'index.html'
     }
   }
