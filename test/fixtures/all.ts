@@ -14,4 +14,11 @@ export async function all () {
     console.info('<- Incoming from %s:%s', remote.address, remote.port)
     console.info(message.toString('utf8'))
   })
+
+  for await (const service of bus.discover()) {
+    console.info('got device')
+    console.info(JSON.stringify(service.details, null, 2))
+  }
 }
+
+// void all()

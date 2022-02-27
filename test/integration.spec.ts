@@ -71,7 +71,7 @@ describe('ssdp', () => {
 
   it('should discover a service once', done => {
     bus.on('service:discover', service => {
-      expect(service).to.have.property('ST', 'urn:schemas-upnp-org:device:Basic:1')
+      expect(service).to.have.property('serviceType', 'urn:schemas-upnp-org:device:Basic:1')
       expect(service.details.foo).to.equal('bar')
       done()
     })
@@ -92,7 +92,7 @@ describe('ssdp', () => {
   it('should update a service', done => {
     bus.on('service:discover', discoveredService => {
       bus.on('service:update', updatedService => {
-        expect(updatedService).to.have.property('UDN', discoveredService.UDN)
+        expect(updatedService).to.have.property('uniqueServiceName', discoveredService.uniqueServiceName)
         expect(updatedService).to.have.nested.property('details.bar', 'baz')
         done()
       })
@@ -166,7 +166,7 @@ describe('ssdp', () => {
       const message = buffer.toString('utf8')
 
       if (message.startsWith('HTTP/1.1 200 OK')) {
-        expect(message).to.contain('USN: ' + bus.udn + '::my-service-type')
+        expect(message).to.contain('USN: ' + bus.usn + '::my-service-type')
         expect(message).to.contain('ST: my-service-type')
         expect(message).to.contain('LOCATION: http://')
         expect(remote).to.deep.equal(searcher)
@@ -212,7 +212,7 @@ describe('ssdp', () => {
       const message = buffer.toString('utf8')
 
       if (message.startsWith('HTTP/1.1 200 OK')) {
-        expect(message).to.contain('USN: ' + bus.udn + '::my-service-type')
+        expect(message).to.contain('USN: ' + bus.usn + '::my-service-type')
         expect(message).to.contain('ST: my-service-type')
         expect(message).to.contain('LOCATION: http://')
         expect(remote).to.deep.equal(searcher)
@@ -279,7 +279,7 @@ describe('ssdp', () => {
 
   it('should handle search responses', done => {
     bus.on('service:discover', service => {
-      expect(service).to.have.property('ST', 'urn:schemas-upnp-org:device:Basic:1')
+      expect(service).to.have.property('serviceType', 'urn:schemas-upnp-org:device:Basic:1')
       expect(service).to.have.nested.property('details.foo', 'bar')
       done()
     })
@@ -306,12 +306,12 @@ describe('ssdp', () => {
       'LOCATION: ' + detailsLocation
 
     bus.on('service:discover', service => {
-      expect(service).to.have.property('ST', 'urn:schemas-upnp-org:device:Basic:1')
-      expect(service).to.have.property('UDN', 'uuid:2f402f80-da50-11e1-9b23-00178809ea66')
+      expect(service).to.have.property('serviceType', 'urn:schemas-upnp-org:device:Basic:1')
+      expect(service).to.have.property('uniqueServiceName', 'uuid:2f402f80-da50-11e1-9b23-00178809ea66')
 
       bus.on('service:update', service => {
-        expect(service).to.have.property('UDN', 'uuid:2f402f80-da50-11e1-9b23-00178809ea66')
-        expect(service).to.have.property('ST', 'urn:schemas-upnp-org:device:Basic:1')
+        expect(service).to.have.property('serviceType', 'urn:schemas-upnp-org:device:Basic:1')
+        expect(service).to.have.property('uniqueServiceName', 'uuid:2f402f80-da50-11e1-9b23-00178809ea66')
         expect(service).to.have.nested.property('details.foo', 'bar')
 
         done()

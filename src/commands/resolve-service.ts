@@ -14,12 +14,13 @@ export async function resolveService (ssdp: SSDP, usn: string, st: string, locat
   if (service == null) {
     newService = true
     service = {
+      location: new URL(location),
       details: {
         pending: true
       },
       expires: 0,
-      ST: st,
-      UDN: usn
+      serviceType: st,
+      uniqueServiceName: usn
     }
 
     cache.cacheService(service)

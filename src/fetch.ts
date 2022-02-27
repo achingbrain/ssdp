@@ -1,12 +1,38 @@
 import http from 'http'
+import https from 'https'
 
-export async function fetch (url: string): Promise<string> {
+export interface RequestInit {
+  method?: 'POST' | 'GET'
+  headers?: Record<string, string>
+  body?: Buffer | string
+}
+
+function initRequest (url: URL, init: RequestInit) {
+  if (url.protocol === 'http:') {
+    return http.request(url, {
+      method: init.method,
+      headers: init.headers
+    })
+  } else if (url.protocol === 'https:') {
+    return https.request(url, {
+      method: init.method,
+      headers: init.headers,
+      rejectUnauthorized: false
+    })
+  } else {
+    throw new Error('Invalid protocol ' + url.protocol)
+  }
+}
+
+export async function fetch (url: string, init: RequestInit = {}): Promise<string> {
   return await new Promise<string>((resolve, reject) => {
-    const request = http.get(url, {
-      headers: {
-        accept: 'application/xml'
-      }
-    }).end()
+    const request = initRequest(new URL(url), init)
+
+    if (init.body != null) {
+      request.write(init.body)
+    }
+
+    request.end()
 
     request.on('error', (err) => {
       reject(err)

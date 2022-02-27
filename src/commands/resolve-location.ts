@@ -6,7 +6,12 @@ export async function resolveLocation (location: string) {
     location = `http://${location}`
   }
 
-  const text = await fetch(location)
+  const text = await fetch(location, {
+    method: 'GET',
+    headers: {
+      accept: 'application/xml'
+    }
+  })
   const result = await parseStringPromise(text, {
     normalize: true,
     explicitArray: false
