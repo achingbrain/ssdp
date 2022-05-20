@@ -38,7 +38,7 @@ export function parseAdvertOptions (ssdp: SSDP, options: Advertisment): Advert {
         modelNumber: 'A vendor specific model number',
         modelURL: 'http://example.com',
         serialNumber: 'A device specific serial number',
-        UDN: ssdp.usn,
+        UDN: ssdp.udn,
         presentationURL: 'index.html'
       }
     }

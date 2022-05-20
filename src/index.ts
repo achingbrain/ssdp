@@ -25,7 +25,7 @@ export interface SSDPSocketOptions {
 }
 
 export interface SSDPOptions {
-  usn: string
+  udn: string
   signature: string
   sockets: SSDPSocketOptions[]
 }
@@ -80,9 +80,24 @@ export interface Advertisment {
 }
 
 export interface SSDP {
-  usn: string
+  /**
+   * Unique device name - identifies the device and must the same over time for a specific device instance
+   */
+  udn: string
+
+  /**
+   * A user-agent style string to identify the implementation
+   */
   signature: string
+
+  /**
+   * Currently open sockets
+   */
   sockets: SSDPSocket[]
+
+  /**
+   * Options passed to the constructor
+   */
   options: SSDPOptions
 
   start: () => Promise<void>
@@ -107,7 +122,7 @@ export interface SSDP {
 }
 
 class SSDPImpl extends EventEmitter implements SSDP {
-  public usn: string
+  public udn: string
   public signature: string
   public sockets: SSDPSocket[]
   public readonly options: SSDPOptions
@@ -116,7 +131,7 @@ class SSDPImpl extends EventEmitter implements SSDP {
     super()
 
     this.options = defaultSsdpOptions(options)
-    this.usn = this.options.usn
+    this.udn = this.options.udn
     this.signature = this.options.signature
     this.sockets = []
   }

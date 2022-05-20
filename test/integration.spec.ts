@@ -217,7 +217,7 @@ describe('ssdp', () => {
     bus.emit('transport:incoming-message', Buffer.from(searchMessage), searcher)
 
     const { message, remote } = await deferred.promise
-    expect(message).to.contain('USN: ' + bus.usn + '::my-service-type')
+    expect(message).to.contain('USN: ' + bus.udn + '::my-service-type')
     expect(message).to.contain('ST: my-service-type')
     expect(message).to.contain('LOCATION: http://')
     expect(remote).to.deep.equal(searcher)
@@ -264,7 +264,7 @@ describe('ssdp', () => {
     bus.emit('transport:incoming-message', Buffer.from(searchMessage), searcher)
 
     const { message, remote } = await deferred.promise
-    expect(message).to.contain('USN: ' + bus.usn + '::my-service-type')
+    expect(message).to.contain('USN: ' + bus.udn + '::my-service-type')
     expect(message).to.contain('ST: my-service-type')
     expect(message).to.contain('LOCATION: http://')
     expect(remote).to.deep.equal(searcher)

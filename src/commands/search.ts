@@ -10,7 +10,7 @@ export function search (ssdp: SSDP, message: SearchMessage, remote: NetworkAddre
     if (message.ST === 'ssdp:all' || advert.usn.toLowerCase() === message.ST.toLowerCase()) {
       ssdp.emit('ssdp:send-message', 'HTTP/1.1 200 OK', {
         ST: message.ST === 'ssdp:all' ? advert.usn : message.ST,
-        USN: `${ssdp.usn}::${advert.usn}`,
+        USN: `${ssdp.udn}::${advert.usn}`,
         LOCATION: advert.location,
         'CACHE-CONTROL': `max-age=${Math.round(advert.ttl / 1000)}`,
         DATE: new Date().toUTCString(),
