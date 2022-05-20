@@ -1,3 +1,14 @@
+## [4.0.0](https://github.com/achingbrain/ssdp/compare/v3.0.4...v4.0.0) (2022-05-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* the `usn` constructor argument has been renamed to `udn`
+
+### Bug Fixes
+
+* rename usn to udn ([#23](https://github.com/achingbrain/ssdp/issues/23)) ([32c689a](https://github.com/achingbrain/ssdp/commit/32c689a0541ced5f7444edc7b28dcab84ede8f91))
+
 ### [3.0.4](https://github.com/achingbrain/ssdp/compare/v3.0.3...v3.0.4) (2022-05-20)
 
 
