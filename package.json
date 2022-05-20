@@ -127,7 +127,7 @@
     "clean": "aegir clean",
     "lint": "aegir lint",
     "dep-check": "aegir dep-check",
-    "build": "aegir build",
+    "build": "aegir build --no-bundle",
     "test": "aegir test -t node -t electron-main",
     "test:node": "aegir test -t node --cov",
     "test:electron-main": "aegir test -t electron-main",

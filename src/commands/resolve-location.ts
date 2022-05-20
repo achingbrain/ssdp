@@ -14,8 +14,13 @@ export async function resolveLocation (location: string) {
   })
   const result = await parseStringPromise(text, {
     normalize: true,
-    explicitArray: false
+    explicitArray: false,
+    explicitRoot: true
   })
+
+  if (result == null) {
+    return {}
+  }
 
   return result.root ?? result
 }
