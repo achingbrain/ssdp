@@ -8,7 +8,6 @@ import { cache } from '../src/cache.js'
 import { adverts } from '../src/adverts.js'
 import defer from 'p-defer'
 import first from 'it-first'
-import pDefer from 'p-defer'
 
 describe('ssdp', () => {
   let bus: SSDP
@@ -71,7 +70,7 @@ describe('ssdp', () => {
   })
 
   it('should discover a service once', async () => {
-    const deferred = pDefer<Service<Record<string, any>>>()
+    const deferred = defer<Service<Record<string, any>>>()
 
     bus.on('service:discover', service => {
       deferred.resolve(service)
@@ -95,7 +94,7 @@ describe('ssdp', () => {
   })
 
   it('should update a service', async () => {
-    const deferred = pDefer<{
+    const deferred = defer<{
       discoveredService: Service<Record<string, any>>
       updatedService: Service<Record<string, any>>
     }>()
@@ -136,8 +135,8 @@ describe('ssdp', () => {
   it('should advertise a service', async () => {
     const usn = 'my-service-type'
     let didByeBye = false
-    const deferredBeforeByeBye = pDefer<string>()
-    const deferredAfterByeBye = pDefer<string>()
+    const deferredBeforeByeBye = defer<string>()
+    const deferredAfterByeBye = defer<string>()
 
     const listener = (socket: SSDPSocket, buffer: Buffer) => {
       const message = buffer.toString('utf8')
@@ -181,7 +180,7 @@ describe('ssdp', () => {
       port: 39823,
       address: '0.0.0.0'
     }
-    const deferred = pDefer<{
+    const deferred = defer<{
       message: string
       remote: NetworkAddress
     }>()
@@ -230,7 +229,7 @@ describe('ssdp', () => {
       port: 39823,
       address: '0.0.0.0'
     }
-    const deferred = pDefer<{
+    const deferred = defer<{
       message: string
       remote: NetworkAddress
     }>()
@@ -273,7 +272,7 @@ describe('ssdp', () => {
 
   it('should search for services', async () => {
     const usn = 'my-service-type'
-    const deferred = pDefer<string>()
+    const deferred = defer<string>()
 
     bus.on('transport:outgoing-message', (socket, buffer, remote) => {
       const message = buffer.toString('utf8')
@@ -291,7 +290,7 @@ describe('ssdp', () => {
   })
 
   it('should search for all services', async () => {
-    const deferred = pDefer<string>()
+    const deferred = defer<string>()
 
     bus.on('transport:outgoing-message', function (socket, buffer, remote) {
       const message = buffer.toString('utf8')
@@ -309,7 +308,7 @@ describe('ssdp', () => {
   })
 
   it('should handle search responses', async () => {
-    const deferred = pDefer<Service<Record<string, any>>>()
+    const deferred = defer<Service<Record<string, any>>>()
 
     bus.on('service:discover', service => {
       deferred.resolve(service)
@@ -332,7 +331,7 @@ describe('ssdp', () => {
   })
 
   it('should handle search responses updating cached services', async () => {
-    const deferred = pDefer<{
+    const deferred = defer<{
       discoveredService: Service<Record<string, any>>
       updatedService: Service<Record<string, any>>
     }>()
