@@ -155,7 +155,7 @@ import ssdp from '@achingbrain/ssdp'
 
 // all arguments are optional
 var bus = ssdp({
-  usn: 'unique-identifier', // defaults to a random UUID
+  udn: 'unique-identifier', // defaults to a random UUID
   // a string to identify the server by
   signature: 'node.js/0.12.6 UPnP/1.1 @achingbrain/ssdp/1.0.0',
   retry {
