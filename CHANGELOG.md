@@ -1,3 +1,10 @@
+### [3.0.4](https://github.com/achingbrain/ssdp/compare/v3.0.3...v3.0.4) (2022-05-20)
+
+
+### Bug Fixes
+
+* null guard on xmljs return value ([#22](https://github.com/achingbrain/ssdp/issues/22)) ([4c3778e](https://github.com/achingbrain/ssdp/commit/4c3778e3a29e25314fd808c9fb3161062aea2224))
+
 ### [3.0.3](https://github.com/achingbrain/ssdp/compare/v3.0.2...v3.0.3) (2022-02-27)
 
 
