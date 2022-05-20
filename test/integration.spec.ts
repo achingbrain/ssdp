@@ -1,6 +1,6 @@
 import sinon from 'sinon'
-import { expect } from 'aegir/utils/chai.js'
-import ssdp, { SSDP, SSDPSocket } from '../src/index.js'
+import { expect } from 'aegir/chai'
+import ssdp, { NetworkAddress, Service, SSDP, SSDPSocket } from '../src/index.js'
 import { freeport } from 'freeport-promise'
 import http from 'http'
 import xml2js from 'xml2js'
@@ -69,11 +69,11 @@ describe('ssdp', () => {
     cache.clear()
   })
 
-  it('should discover a service once', done => {
+  it('should discover a service once', async () => {
+    const deferred = defer<Service<Record<string, any>>>()
+
     bus.on('service:discover', service => {
-      expect(service).to.have.property('serviceType', 'urn:schemas-upnp-org:device:Basic:1')
-      expect(service.details.foo).to.equal('bar')
-      done()
+      deferred.resolve(service)
     })
 
     const message = 'NOTIFY * HTTP/1.1\r\n' +
@@ -87,14 +87,24 @@ describe('ssdp', () => {
 
     bus.emit('transport:incoming-message', Buffer.from(message), { address: 'test', port: 0 })
     bus.emit('transport:incoming-message', Buffer.from(message), { address: 'test', port: 0 })
+
+    const service = await deferred.promise
+    expect(service).to.have.property('serviceType', 'urn:schemas-upnp-org:device:Basic:1')
+    expect(service.details.foo).to.equal('bar')
   })
 
-  it('should update a service', done => {
+  it('should update a service', async () => {
+    const deferred = defer<{
+      discoveredService: Service<Record<string, any>>
+      updatedService: Service<Record<string, any>>
+    }>()
+
     bus.on('service:discover', discoveredService => {
       bus.on('service:update', updatedService => {
-        expect(updatedService).to.have.property('uniqueServiceName', discoveredService.uniqueServiceName)
-        expect(updatedService).to.have.nested.property('details.bar', 'baz')
-        done()
+        deferred.resolve({
+          discoveredService,
+          updatedService
+        })
       })
 
       // expire the detail cache
@@ -116,31 +126,33 @@ describe('ssdp', () => {
       'LOCATION: ' + detailsLocation
 
     bus.emit('transport:incoming-message', Buffer.from(message), { address: 'test', port: 0 })
+
+    const { discoveredService, updatedService } = await deferred.promise
+    expect(updatedService).to.have.property('uniqueServiceName', discoveredService.uniqueServiceName)
+    expect(updatedService).to.have.nested.property('details.bar', 'baz')
   })
 
-  it('should advertise a service', done => {
+  it('should advertise a service', async () => {
     const usn = 'my-service-type'
     let didByeBye = false
+    const deferredBeforeByeBye = defer<string>()
+    const deferredAfterByeBye = defer<string>()
 
     const listener = (socket: SSDPSocket, buffer: Buffer) => {
       const message = buffer.toString('utf8')
 
       if (!didByeBye) {
-        expect(message).to.contain('NT: ' + usn)
-        expect(message).to.contain('NTS: ssdp:byebye')
+        deferredBeforeByeBye.resolve(message)
         didByeBye = true
       } else {
-        expect(message).to.contain('NT: ' + usn)
-        expect(message).to.contain('NTS: ssdp:alive')
+        deferredAfterByeBye.resolve(message)
         bus.off('transport:outgoing-message', listener)
-
-        done()
       }
     }
 
     bus.on('transport:outgoing-message', listener)
 
-    bus.advertise({
+    await bus.advertise({
       usn: usn,
       details: {
         root: {
@@ -152,30 +164,36 @@ describe('ssdp', () => {
         }
       }
     })
-      .catch(error => done(error))
+
+    const firstMessage = await deferredBeforeByeBye.promise
+    expect(firstMessage).to.contain('NT: ' + usn)
+    expect(firstMessage).to.contain('NTS: ssdp:byebye')
+
+    const secondMessage = await deferredAfterByeBye.promise
+    expect(secondMessage).to.contain('NT: ' + usn)
+    expect(secondMessage).to.contain('NTS: ssdp:alive')
   })
 
-  it('should respond to searches for an advertised service', done => {
+  it('should respond to searches for an advertised service', async () => {
     const usn = 'my-service-type'
     const searcher = {
       port: 39823,
       address: '0.0.0.0'
     }
+    const deferred = defer<{
+      message: string
+      remote: NetworkAddress
+    }>()
 
     bus.on('transport:outgoing-message', (socket, buffer, remote) => {
       const message = buffer.toString('utf8')
 
       if (message.startsWith('HTTP/1.1 200 OK')) {
-        expect(message).to.contain('USN: ' + bus.usn + '::my-service-type')
-        expect(message).to.contain('ST: my-service-type')
-        expect(message).to.contain('LOCATION: http://')
-        expect(remote).to.deep.equal(searcher)
-
-        done()
+        deferred.resolve({ message, remote })
       }
     })
 
-    bus.advertise({
+    await bus.advertise({
       usn: usn,
       details: function () {
         return {
@@ -189,39 +207,42 @@ describe('ssdp', () => {
         }
       }
     })
-      .then(() => {
-        const message = 'M-SEARCH * HTTP/1.1\r\n' +
-          'HOST: 239.255.255.250:1900\r\n' +
-          'ST: ' + usn + '\r\n' +
-          'MAN: ssdp:discover\r\n' +
-          'MX: 0'
 
-        bus.emit('transport:incoming-message', Buffer.from(message), searcher)
-      })
-      .catch(error => done(error))
+    const searchMessage = 'M-SEARCH * HTTP/1.1\r\n' +
+      'HOST: 239.255.255.250:1900\r\n' +
+      'ST: ' + usn + '\r\n' +
+      'MAN: ssdp:discover\r\n' +
+      'MX: 0'
+
+    bus.emit('transport:incoming-message', Buffer.from(searchMessage), searcher)
+
+    const { message, remote } = await deferred.promise
+    expect(message).to.contain('USN: ' + bus.usn + '::my-service-type')
+    expect(message).to.contain('ST: my-service-type')
+    expect(message).to.contain('LOCATION: http://')
+    expect(remote).to.deep.equal(searcher)
   })
 
-  it('should respond to global searches', done => {
+  it('should respond to global searches', async () => {
     const usn = 'my-service-type'
     const searcher = {
       port: 39823,
       address: '0.0.0.0'
     }
+    const deferred = defer<{
+      message: string
+      remote: NetworkAddress
+    }>()
 
     bus.on('transport:outgoing-message', (socket, buffer, remote) => {
       const message = buffer.toString('utf8')
 
       if (message.startsWith('HTTP/1.1 200 OK')) {
-        expect(message).to.contain('USN: ' + bus.usn + '::my-service-type')
-        expect(message).to.contain('ST: my-service-type')
-        expect(message).to.contain('LOCATION: http://')
-        expect(remote).to.deep.equal(searcher)
-
-        done()
+        deferred.resolve({ message, remote })
       }
     })
 
-    bus.advertise({
+    await bus.advertise({
       usn: usn,
       details: Promise.resolve({
         root: {
@@ -233,55 +254,64 @@ describe('ssdp', () => {
         }
       })
     })
-      .then(advert => {
-        const message = 'M-SEARCH * HTTP/1.1\r\n' +
-        'HOST: 239.255.255.250:1900\r\n' +
-        'ST: ssdp:all\r\n' +
-        'MAN: ssdp:discover\r\n' +
-        'MX: 0'
 
-        bus.emit('transport:incoming-message', Buffer.from(message), searcher)
-      })
-      .catch(error => done(error))
+    const searchMessage = 'M-SEARCH * HTTP/1.1\r\n' +
+    'HOST: 239.255.255.250:1900\r\n' +
+    'ST: ssdp:all\r\n' +
+    'MAN: ssdp:discover\r\n' +
+    'MX: 0'
+
+    bus.emit('transport:incoming-message', Buffer.from(searchMessage), searcher)
+
+    const { message, remote } = await deferred.promise
+    expect(message).to.contain('USN: ' + bus.usn + '::my-service-type')
+    expect(message).to.contain('ST: my-service-type')
+    expect(message).to.contain('LOCATION: http://')
+    expect(remote).to.deep.equal(searcher)
   })
 
-  it('should search for services', done => {
+  it('should search for services', async () => {
     const usn = 'my-service-type'
+    const deferred = defer<string>()
 
     bus.on('transport:outgoing-message', (socket, buffer, remote) => {
       const message = buffer.toString('utf8')
 
       if (message.startsWith('M-SEARCH * HTTP/1.1')) {
-        expect(message).to.contain('ST: ' + usn)
-        expect(message).to.contain('MAN: ssdp:discover')
-
-        done()
+        deferred.resolve(message)
       }
     })
 
     void first(bus.discover(usn))
+
+    const message = await deferred.promise
+    expect(message).to.contain('ST: ' + usn)
+    expect(message).to.contain('MAN: ssdp:discover')
   })
 
-  it('should search for all services', done => {
+  it('should search for all services', async () => {
+    const deferred = defer<string>()
+
     bus.on('transport:outgoing-message', function (socket, buffer, remote) {
       const message = buffer.toString('utf8')
 
       if (message.startsWith('M-SEARCH * HTTP/1.1')) {
-        expect(message).to.contain('ST: ssdp:all')
-        expect(message).to.contain('MAN: ssdp:discover')
-
-        done()
+        deferred.resolve(message)
       }
     })
 
     void first(bus.discover())
+
+    const message = await deferred.promise
+    expect(message).to.contain('ST: ssdp:all')
+    expect(message).to.contain('MAN: ssdp:discover')
   })
 
-  it('should handle search responses', done => {
+  it('should handle search responses', async () => {
+    const deferred = defer<Service<Record<string, any>>>()
+
     bus.on('service:discover', service => {
-      expect(service).to.have.property('serviceType', 'urn:schemas-upnp-org:device:Basic:1')
-      expect(service).to.have.nested.property('details.foo', 'bar')
-      done()
+      deferred.resolve(service)
     })
 
     const message = 'HTTP/1.1 200 OK\r\n' +
@@ -294,9 +324,18 @@ describe('ssdp', () => {
 
     bus.emit('transport:incoming-message', Buffer.from(message), { address: 'test', port: 0 })
     bus.emit('transport:incoming-message', Buffer.from(message), { address: 'test', port: 0 })
+
+    const service = await deferred.promise
+    expect(service).to.have.property('serviceType', 'urn:schemas-upnp-org:device:Basic:1')
+    expect(service).to.have.nested.property('details.foo', 'bar')
   })
 
-  it('should handle search responses updating cached services', done => {
+  it('should handle search responses updating cached services', async () => {
+    const deferred = defer<{
+      discoveredService: Service<Record<string, any>>
+      updatedService: Service<Record<string, any>>
+    }>()
+
     const message = 'HTTP/1.1 200 OK\r\n' +
       'CACHE-CONTROL: max-age=100\r\n' +
       'EXT:\r\n' +
@@ -305,16 +344,9 @@ describe('ssdp', () => {
       'SERVER: node.js/0.12.6 UPnP/1.1 @achingbrain/ssdp/0.0.1\r\n' +
       'LOCATION: ' + detailsLocation
 
-    bus.on('service:discover', service => {
-      expect(service).to.have.property('serviceType', 'urn:schemas-upnp-org:device:Basic:1')
-      expect(service).to.have.property('uniqueServiceName', 'uuid:2f402f80-da50-11e1-9b23-00178809ea66')
-
-      bus.on('service:update', service => {
-        expect(service).to.have.property('serviceType', 'urn:schemas-upnp-org:device:Basic:1')
-        expect(service).to.have.property('uniqueServiceName', 'uuid:2f402f80-da50-11e1-9b23-00178809ea66')
-        expect(service).to.have.nested.property('details.foo', 'bar')
-
-        done()
+    bus.on('service:discover', discoveredService => {
+      bus.on('service:update', updatedService => {
+        deferred.resolve({ discoveredService, updatedService })
       })
 
       // expire the detail cache
@@ -328,5 +360,12 @@ describe('ssdp', () => {
 
     bus.emit('transport:incoming-message', Buffer.from(message), { address: 'test', port: 0 })
     bus.emit('transport:incoming-message', Buffer.from(message), { address: 'test', port: 0 })
+
+    const { discoveredService, updatedService } = await deferred.promise
+    expect(discoveredService).to.have.property('serviceType', 'urn:schemas-upnp-org:device:Basic:1')
+    expect(discoveredService).to.have.property('uniqueServiceName', 'uuid:2f402f80-da50-11e1-9b23-00178809ea66')
+    expect(updatedService).to.have.property('serviceType', 'urn:schemas-upnp-org:device:Basic:1')
+    expect(updatedService).to.have.property('uniqueServiceName', 'uuid:2f402f80-da50-11e1-9b23-00178809ea66')
+    expect(updatedService).to.have.nested.property('details.foo', 'bar')
   })
 })
