@@ -28,6 +28,7 @@ export interface SSDPOptions {
   udn: string
   signature: string
   sockets: SSDPSocketOptions[]
+  start: boolean
 }
 
 export interface SSDPSocket extends Socket {
@@ -126,6 +127,7 @@ class SSDPImpl extends EventEmitter implements SSDP {
   public signature: string
   public sockets: SSDPSocket[]
   public readonly options: SSDPOptions
+  private readonly abortController: AbortController
 
   constructor (options?: Partial<SSDPOptions>) {
     super()
@@ -134,11 +136,12 @@ class SSDPImpl extends EventEmitter implements SSDP {
     this.udn = this.options.udn
     this.signature = this.options.signature
     this.sockets = []
+    this.abortController = new AbortController()
   }
 
   async start () {
     // set up UDP sockets listening for SSDP broadcasts
-    this.sockets = await createSockets(this)
+    this.sockets = await createSockets(this, this.abortController.signal)
 
     // set up protocol listeners
     this.on('transport:incoming-message', parseSsdpMessage.bind(null, this))
@@ -160,6 +163,8 @@ class SSDPImpl extends EventEmitter implements SSDP {
         })
       })
     )
+
+    this.abortController.abort()
   }
 
   async advertise (advert: Advertisment): Promise<CachedAdvert> {
@@ -191,10 +196,12 @@ class SSDPImpl extends EventEmitter implements SSDP {
   }
 }
 
-export default async function (options?: Partial<SSDPOptions>): Promise<SSDP> {
+export default async function (options: Partial<SSDPOptions> = {}): Promise<SSDP> {
   const ssdp = new SSDPImpl(options)
 
-  await ssdp.start()
+  if (options.start !== false) {
+    await ssdp.start()
+  }
 
   return ssdp
 }
