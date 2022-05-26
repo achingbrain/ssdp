@@ -1,3 +1,10 @@
+### [4.0.1](https://github.com/achingbrain/ssdp/compare/v4.0.0...v4.0.1) (2022-05-26)
+
+
+### Bug Fixes
+
+* allow not starting ssdp bus ([#24](https://github.com/achingbrain/ssdp/issues/24)) ([7fe6054](https://github.com/achingbrain/ssdp/commit/7fe6054f4178fce7e8f6bfa88a305ea789ab125a))
+
 ## [4.0.0](https://github.com/achingbrain/ssdp/compare/v3.0.4...v4.0.0) (2022-05-20)
 
 
