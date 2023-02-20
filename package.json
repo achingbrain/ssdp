@@ -137,11 +137,9 @@
     "event-iterator": "^2.0.0",
     "freeport-promise": "^2.0.0",
     "merge-options": "^3.0.4",
-    "uuid": "^8.3.2",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "@types/uuid": "^8.3.4",
     "@types/xml2js": "^0.4.9",
     "aegir": "^37.0.15",
     "it-first": "^1.0.7",
