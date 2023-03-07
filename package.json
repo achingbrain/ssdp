@@ -28,6 +28,7 @@
   "files": [
     "src",
     "dist/src",
+    "dist/package.json",
     "!dist/test",
     "!**/*.tsbuildinfo"
   ],
