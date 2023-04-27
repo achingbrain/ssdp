@@ -1,3 +1,10 @@
+## [4.0.2](https://github.com/achingbrain/ssdp/compare/v4.0.1...v4.0.2) (2023-04-27)
+
+
+### Trivial Changes
+
+* **deps:** Updated xml2js to 0.5.0 to patch CVE-2023-0842 ([#43](https://github.com/achingbrain/ssdp/issues/43)) ([fa5086f](https://github.com/achingbrain/ssdp/commit/fa5086fc7fe0fb55012c0e15ef18bfb54b54cf30)), closes [/github.com/Leonidas-from-XIV/node-xml2js/issues/663#issuecomment-1501088667](https://github.com/achingbrain//github.com/Leonidas-from-XIV/node-xml2js/issues/663/issues/issuecomment-1501088667)
+
 ### [4.0.1](https://github.com/achingbrain/ssdp/compare/v4.0.0...v4.0.1) (2022-05-26)
 
 
