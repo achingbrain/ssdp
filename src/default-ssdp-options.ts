@@ -7,7 +7,7 @@ import mergeOptions from 'merge-options'
 import type { SSDPOptions } from './index.js'
 
 const req = createRequire(import.meta.url)
-const pkg = req('../../package.json')
+const pkg = req('../package.json')
 
 const DEFAULT_SSDP_SIGNATURE = util.format('node.js/%s UPnP/1.1 %s/%s', process.version.substring(1), pkg.name, pkg.version)
 
