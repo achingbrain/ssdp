@@ -1,3 +1,10 @@
+## [4.0.4](https://github.com/achingbrain/ssdp/compare/v4.0.3...v4.0.4) (2023-04-27)
+
+
+### Bug Fixes
+
+* remove uuid dependency ([#35](https://github.com/achingbrain/ssdp/issues/35)) ([4daa741](https://github.com/achingbrain/ssdp/commit/4daa7419654c15ea36ecca919e7ad2003dc5d61e))
+
 ## [4.0.3](https://github.com/achingbrain/ssdp/compare/v4.0.2...v4.0.3) (2023-04-27)
 
 
