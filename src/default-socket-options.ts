@@ -1,5 +1,5 @@
-import type { SSDPSocketOptions } from './index.js'
 import mergeOptions from 'merge-options'
+import type { SSDPSocketOptions } from './index.js'
 
 export function defaultSocketOptions (options?: Partial<SSDPSocketOptions>): SSDPSocketOptions {
   return mergeOptions(options ?? {}, {

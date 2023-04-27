@@ -2,7 +2,7 @@
 
 import ssdp from '../../src/index.js'
 
-export async function all () {
+export async function all (): Promise<void> {
   const bus = await ssdp()
   bus.on('error', console.error)
 

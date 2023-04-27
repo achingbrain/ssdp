@@ -2,7 +2,7 @@ import type { NetworkAddress, SSDP } from './index.js'
 
 const SEARCH_RESPONSE = 'SEARCH-RESPONSE'
 
-export function parseSsdpMessage (ssdp: SSDP, buffer: Buffer, remote: NetworkAddress) {
+export function parseSsdpMessage (ssdp: SSDP, buffer: Buffer, remote: NetworkAddress): void {
   const lines = buffer.toString('utf8').trim().split(/\r?\n/)
   let type = lines.shift()
 
@@ -49,7 +49,7 @@ export function parseSsdpMessage (ssdp: SSDP, buffer: Buffer, remote: NetworkAdd
   ssdp.emit(`ssdp:${type}`, message, remote)
 }
 
-function unwrap (string: string) {
+function unwrap (string: string): string | number {
   const length = string.length
 
   if (string.substring(0, 1) === '"' && string.substring(length - 1) === '"') {

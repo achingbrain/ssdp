@@ -1,13 +1,13 @@
-import { freeport } from 'freeport-promise'
 import http from 'http'
-import { findAllInterfaces } from './find-all-interfaces.js'
+import { freeport } from 'freeport-promise'
 import { detailsHandler } from './details-handler.js'
-import type { SSDP } from '../index.js'
+import { findAllInterfaces } from './find-all-interfaces.js'
 import type { Advert } from './index.js'
+import type { SSDP } from '../index.js'
 
 export async function createLocation (ssdp: SSDP, advert: Advert): Promise<() => Promise<void>> {
   if (advert.location != null) {
-    return async () => await Promise.resolve()
+    return async () => Promise.resolve()
   }
 
   const servers: http.Server[] = []
@@ -15,12 +15,12 @@ export async function createLocation (ssdp: SSDP, advert: Advert): Promise<() =>
   advert.location = {}
 
   await Promise.all(
-    ssdp.sockets.map(async socket => await Promise.all(
+    ssdp.sockets.map(async socket => Promise.all(
       findAllInterfaces(socket.type === 'udp4' && advert.ipv4, socket.type === 'udp6' && advert.ipv6)
         .map(async iface => {
-          return await freeport()
+          await freeport()
             .then(async port => {
-              return await new Promise<void>((resolve, reject) => {
+              await new Promise<void>((resolve, reject) => {
                 let location = 'http://'
 
                 if (socket.type === 'udp6') {
@@ -55,7 +55,7 @@ export async function createLocation (ssdp: SSDP, advert: Advert): Promise<() =>
 
   return async () => {
     await Promise.all(
-      servers.map(async server => await new Promise<void>((resolve, reject) => {
+      servers.map(async server => new Promise<void>((resolve, reject) => {
         server.close()
         resolve()
       }))

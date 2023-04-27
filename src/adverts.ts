@@ -12,25 +12,25 @@ class Adverts {
     this.adverts = []
   }
 
-  add (advert: CachedAdvert) {
+  add (advert: CachedAdvert): void {
     this.adverts.push(advert)
   }
 
-  remove (advert: CachedAdvert) {
+  remove (advert: CachedAdvert): void {
     this.adverts = this.adverts.filter(ad => ad !== advert)
   }
 
-  clear () {
+  clear (): void {
     this.adverts = []
   }
 
-  forEach (fn: (advert: Advert) => void) {
-    this.adverts.forEach(ad => fn(ad.service))
+  forEach (fn: (advert: Advert) => void): void {
+    this.adverts.forEach(ad => { fn(ad.service) })
   }
 
-  async stopAll () {
+  async stopAll (): Promise<void> {
     await Promise.all(
-      this.adverts.map(async ad => await ad.stop())
+      this.adverts.map(async ad => ad.stop())
     )
   }
 }

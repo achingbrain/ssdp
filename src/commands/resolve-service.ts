@@ -2,7 +2,7 @@ import { cache } from '../cache.js'
 import { resolveLocation } from './resolve-location.js'
 import type { SSDP } from '../index.js'
 
-export async function resolveService (ssdp: SSDP, usn: string, st: string, location: string, ttl: number) {
+export async function resolveService (ssdp: SSDP, usn: string, st: string, location: string, ttl: number): Promise<void> {
   // all arguments are required
   if (ssdp == null || usn == null || st == null || location == null || ttl == null) {
     return

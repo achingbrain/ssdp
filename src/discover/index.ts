@@ -1,6 +1,6 @@
 import type { SSDP } from '../index.js'
 
-export function discover (ssdp: SSDP, serviceType?: string) {
+export function discover (ssdp: SSDP, serviceType?: string): void {
   serviceType = serviceType ?? 'ssdp:all'
 
   ssdp.emit('ssdp:send-message', 'M-SEARCH * HTTP/1.1', {

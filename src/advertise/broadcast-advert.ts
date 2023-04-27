@@ -1,7 +1,7 @@
 import type { Advert } from './index.js'
 import type { SSDP } from '../index.js'
 
-export const broadcastAdvert = (ssdp: SSDP, advert: Advert, notifcationSubType: string) => {
+export const broadcastAdvert = (ssdp: SSDP, advert: Advert, notifcationSubType: string): void => {
   ssdp.emit('ssdp:send-message', 'NOTIFY * HTTP/1.1', {
     NT: advert.usn,
     NTS: notifcationSubType,
