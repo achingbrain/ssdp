@@ -1,15 +1,15 @@
 import { EventEmitter } from 'events'
-import { defaultSsdpOptions } from './default-ssdp-options.js'
-import { createSockets } from './create-sockets.js'
+import { EventIterator } from 'event-iterator'
 import { advertise } from './advertise/index.js'
-import { discover } from './discover/index.js'
+import { adverts, type CachedAdvert } from './adverts.js'
 import { notify } from './commands/notify.js'
 import { search } from './commands/search.js'
+import { createSockets } from './create-sockets.js'
+import { defaultSsdpOptions } from './default-ssdp-options.js'
+import { discover } from './discover/index.js'
 import { searchResponse } from './discover/search-response.js'
-import { adverts, CachedAdvert } from './adverts.js'
 import { parseSsdpMessage } from './parse-ssdp-message.js'
 import { sendSsdpMessage } from './send-ssdp-message.js'
-import { EventIterator } from 'event-iterator'
 import type { Socket } from 'dgram'
 
 export interface NetworkAddress {
@@ -139,7 +139,7 @@ class SSDPImpl extends EventEmitter implements SSDP {
     this.abortController = new AbortController()
   }
 
-  async start () {
+  async start (): Promise<void> {
     // set up UDP sockets listening for SSDP broadcasts
     this.sockets = await createSockets(this, this.abortController.signal)
 
@@ -151,13 +151,13 @@ class SSDPImpl extends EventEmitter implements SSDP {
     this.on('ssdp:search-response', searchResponse.bind(null, this))
   }
 
-  async stop () {
+  async stop (): Promise<void> {
     await adverts.stopAll()
 
     await Promise.all(
       this.sockets.map(async socket => {
-        return await new Promise<void>(resolve => {
-          socket.on('close', () => resolve())
+        await new Promise<void>(resolve => {
+          socket.on('close', () => { resolve() })
           socket.close()
           socket.closed = true
         })
@@ -168,13 +168,13 @@ class SSDPImpl extends EventEmitter implements SSDP {
   }
 
   async advertise (advert: Advertisment): Promise<CachedAdvert> {
-    return await advertise(this, advert)
+    return advertise(this, advert)
   }
 
-  async * discover <Details = Record<string, any>> (serviceType?: string) {
+  async * discover <Details = Record<string, any>> (serviceType?: string): AsyncGenerator<any, void, any> {
     const iterator = new EventIterator<Service<Details>>(
       ({ push }) => {
-        const listener = (service: Service<Details>) => {
+        const listener = (service: Service<Details>): void => {
           if (serviceType != null && service.serviceType !== serviceType) {
             return
           }

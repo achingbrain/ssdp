@@ -27,12 +27,13 @@
   "types": "./dist/src/index.d.ts",
   "files": [
     "src",
-    "dist/src",
+    "dist",
     "!dist/test",
     "!**/*.tsbuildinfo"
   ],
   "exports": {
     ".": {
+      "types": "./dist/src/index.d.ts",
       "import": "./dist/src/index.js"
     }
   },
@@ -69,15 +70,15 @@
               "release": "patch"
             },
             {
-              "type": "chore",
-              "release": "patch"
-            },
-            {
               "type": "docs",
               "release": "patch"
             },
             {
               "type": "test",
+              "release": "patch"
+            },
+            {
+              "type": "deps",
               "release": "patch"
             },
             {
@@ -107,7 +108,11 @@
               },
               {
                 "type": "docs",
-                "section": "Trivial Changes"
+                "section": "Documentation"
+              },
+              {
+                "type": "deps",
+                "section": "Dependencies"
               },
               {
                 "type": "test",
@@ -141,11 +146,12 @@
     "xml2js": "^0.5.0"
   },
   "devDependencies": {
+    "@types/sinon": "^10.0.14",
     "@types/uuid": "^8.3.4",
     "@types/xml2js": "^0.4.11",
-    "aegir": "^37.0.15",
-    "it-first": "^1.0.7",
+    "aegir": "^39.0.2",
+    "it-first": "^3.0.1",
     "p-defer": "^4.0.0",
-    "sinon": "^14.0.0"
+    "sinon": "^15.0.4"
   }
 }

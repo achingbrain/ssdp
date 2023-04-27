@@ -1,6 +1,6 @@
 import type { NetworkAddress, SSDP, SSDPSocket } from './index.js'
 
-function isIpv4Address (address: string) {
+function isIpv4Address (address: string): boolean {
   const parts = address.trim().split('.')
 
   if (parts.length !== 4) {
@@ -18,28 +18,27 @@ function isIpv4Address (address: string) {
   return true
 }
 
-const addressFamilyMismatch = (remote: NetworkAddress, socket: SSDPSocket) => {
+const addressFamilyMismatch = (remote: NetworkAddress, socket: SSDPSocket): boolean => {
   return !(socket.type === 'udp4' && isIpv4Address(remote.address))
 }
 
-export function sendSsdpMessage (ssdp: SSDP, status: string, headers: Record<string, string>, remote: NetworkAddress) {
+export function sendSsdpMessage (ssdp: SSDP, status: string, headers: Record<string, string>, remote: NetworkAddress): void {
   Promise.all(
     ssdp.sockets.map(async socket => {
-      return await new Promise<void>((resolve, reject) => {
+      await new Promise<void>((resolve, reject) => {
         if (socket.closed) {
-          return resolve()
+          resolve(); return
         }
 
         const recipient = remote ?? socket.options.broadcast
 
         // don't send messages over udp6 sockets and expect them to reach upd4 recipients
         if (recipient != null && addressFamilyMismatch(recipient, socket)) {
-          return resolve()
+          resolve(); return
         }
 
         if (headers.LOCATION != null) {
-          // TODO: wat
-          // @ts-expect-error
+          // @ts-expect-error wat
           headers.LOCATION = headers.LOCATION[socket.type]
         }
 
@@ -62,7 +61,7 @@ export function sendSsdpMessage (ssdp: SSDP, status: string, headers: Record<str
 
         socket.send(buffer, 0, buffer.length, recipient.port, recipient.address, error => {
           if (error != null) {
-            return reject(error)
+            reject(error); return
           }
 
           resolve()

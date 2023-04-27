@@ -1,9 +1,9 @@
 
+import { createRequire } from 'module'
+import util from 'util'
+import mergeOptions from 'merge-options'
 import { v4 } from 'uuid'
 import { defaultSocketOptions } from './default-socket-options.js'
-import util from 'util'
-import { createRequire } from 'module'
-import mergeOptions from 'merge-options'
 import type { SSDPOptions } from './index.js'
 
 const req = createRequire(import.meta.url)

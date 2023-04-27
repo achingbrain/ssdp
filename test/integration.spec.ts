@@ -1,13 +1,13 @@
-import sinon from 'sinon'
-import { expect } from 'aegir/chai'
-import ssdp, { NetworkAddress, Service, SSDP, SSDPSocket } from '../src/index.js'
-import { freeport } from 'freeport-promise'
 import http from 'http'
-import xml2js from 'xml2js'
-import { cache } from '../src/cache.js'
-import { adverts } from '../src/adverts.js'
-import defer from 'p-defer'
+import { expect } from 'aegir/chai'
+import { freeport } from 'freeport-promise'
 import first from 'it-first'
+import defer from 'p-defer'
+import sinon from 'sinon'
+import xml2js from 'xml2js'
+import { adverts } from '../src/adverts.js'
+import { cache } from '../src/cache.js'
+import ssdp, { type NetworkAddress, type Service, type SSDP, type SSDPSocket } from '../src/index.js'
 
 describe('ssdp', () => {
   let bus: SSDP
@@ -138,7 +138,7 @@ describe('ssdp', () => {
     const deferredBeforeByeBye = defer<string>()
     const deferredAfterByeBye = defer<string>()
 
-    const listener = (socket: SSDPSocket, buffer: Buffer) => {
+    const listener = (socket: SSDPSocket, buffer: Buffer): void => {
       const message = buffer.toString('utf8')
 
       if (!didByeBye) {
@@ -153,7 +153,7 @@ describe('ssdp', () => {
     bus.on('transport:outgoing-message', listener)
 
     await bus.advertise({
-      usn: usn,
+      usn,
       details: {
         root: {
           specVersion: {
@@ -194,7 +194,7 @@ describe('ssdp', () => {
     })
 
     await bus.advertise({
-      usn: usn,
+      usn,
       details: function () {
         return {
           root: {
@@ -243,7 +243,7 @@ describe('ssdp', () => {
     })
 
     await bus.advertise({
-      usn: usn,
+      usn,
       details: Promise.resolve({
         root: {
           specVersion: {

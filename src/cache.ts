@@ -8,7 +8,7 @@ class Cache {
     this.services = new Map()
   }
 
-  hasService (serviceType: string, uniqueServiceName: string) {
+  hasService (serviceType: string, uniqueServiceName: string): boolean {
     const instances = this.services.get(serviceType)
 
     if (instances == null) {
@@ -18,11 +18,11 @@ class Cache {
     return instances.has(uniqueServiceName)
   }
 
-  getService (serviceType: string, uniqueServiceName: string) {
+  getService (serviceType: string, uniqueServiceName: string): Service<Record<string, any>> | undefined {
     const instances = this.services.get(serviceType)
 
     if (instances == null) {
-      return undefined
+      return
     }
 
     const service = instances.get(uniqueServiceName)
@@ -34,7 +34,7 @@ class Cache {
     return service
   }
 
-  deleteService (serviceType: string, uniqueServiceName: string) {
+  deleteService (serviceType: string, uniqueServiceName: string): void {
     const instances = this.services.get(serviceType)
 
     if (instances == null) {
@@ -48,14 +48,14 @@ class Cache {
     }
   }
 
-  cacheService (service: Service) {
+  cacheService (service: Service): void {
     const instances = this.services.get(service.serviceType) ?? new Map()
     instances.set(service.uniqueServiceName, service)
 
     this.services.set(service.serviceType, instances)
   }
 
-  clear () {
+  clear (): void {
     this.services = new Map()
   }
 }

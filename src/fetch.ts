@@ -7,7 +7,7 @@ export interface RequestInit {
   body?: Buffer | string
 }
 
-function initRequest (url: URL, init: RequestInit) {
+function initRequest (url: URL, init: RequestInit): http.ClientRequest {
   if (url.protocol === 'http:') {
     return http.request(url, {
       method: init.method,
@@ -25,7 +25,7 @@ function initRequest (url: URL, init: RequestInit) {
 }
 
 export async function fetch (url: string, init: RequestInit = {}): Promise<string> {
-  return await new Promise<string>((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     const request = initRequest(new URL(url), init)
 
     if (init.body != null) {
@@ -39,8 +39,9 @@ export async function fetch (url: string, init: RequestInit = {}): Promise<strin
     })
 
     request.on('response', (response) => {
-      if (response.headers['content-type'] != null && !response.headers['content-type'].includes('/xml')) {
-        return reject(new Error('Bad content type ' + response.headers['content-type']))
+      if (response.headers['content-type'] != null && response.headers['content-type'].includes('/xml') === false) {
+        reject(new Error(`Bad content type ${response.headers['content-type']}`))
+        return
       }
 
       let body = ''

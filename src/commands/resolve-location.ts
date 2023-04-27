@@ -1,7 +1,7 @@
 import { parseStringPromise } from 'xml2js'
 import { fetch } from '../fetch.js'
 
-export async function resolveLocation (location: string) {
+export async function resolveLocation (location: string): Promise<any> {
   if (location.substring(0, 4) !== 'http') {
     location = `http://${location}`
   }
