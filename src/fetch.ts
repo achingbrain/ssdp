@@ -39,7 +39,7 @@ export async function fetch (url: string, init: RequestInit = {}): Promise<strin
     })
 
     request.on('response', (response) => {
-      if (response.headers['content-type'] != null && response.headers['content-type'].includes('/xml') === false) {
+      if (response.headers['content-type'] != null && !response.headers['content-type'].includes('/xml')) {
         reject(new Error(`Bad content type ${response.headers['content-type']}`))
         return
       }
