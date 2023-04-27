@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'http'
 
-export function detailsHandler (createDetails: () => Promise<Record<string, any>>, request: IncomingMessage, response: ServerResponse) {
+export function detailsHandler (createDetails: () => Promise<Record<string, any>>, request: IncomingMessage, response: ServerResponse): void {
   createDetails()
     .then(details => {
       response.writeHead(200, { 'Content-Type': 'text/xml' })

@@ -1,20 +1,39 @@
-# SSDP
+# @achingbrain/ssdp <!-- omit in toc -->
 
-[![Build Status](https://github.com/achingbrain/ssdp/actions/workflows/js-test-and-release.yml/badge.svg?branch=master)](https://github.com/achingbrain/ssdp/actions/workflows/js-test-and-release.yml)
-[![Coverage Status](https://coveralls.io/repos/achingbrain/ssdp/badge.svg?branch=master&service=github)](https://coveralls.io/github/achingbrain/ssdp?branch=master)
-[![Dependency Status](https://david-dm.org/achingbrain/ssdp.svg)](https://david-dm.org/achingbrain/ssdp)
+[![codecov](https://img.shields.io/codecov/c/github/achingbrain/ssdp.svg?style=flat-square)](https://codecov.io/gh/achingbrain/ssdp)
+[![CI](https://img.shields.io/github/actions/workflow/status/achingbrain/ssdp/js-test-and-release.yml?branch=master\&style=flat-square)](https://github.com/achingbrain/ssdp/actions/workflows/js-test-and-release.yml?query=branch%3Amaster)
+
+> Yet another SSDP implementation for node.js
+
+## Table of contents <!-- omit in toc -->
+
+- [Install](#install)
+- [Usage](#usage)
+  - [Find a service](#find-a-service)
+  - [Find all services](#find-all-services)
+  - [Advertise a service](#advertise-a-service)
+  - [Integrate with existing HTTP servers](#integrate-with-existing-http-servers)
+    - [Hapi](#hapi)
+    - [Express](#express)
+  - [Shutting down gracefully](#shutting-down-gracefully)
+  - [Full API and options](#full-api-and-options)
+  - [Device description document](#device-description-document)
+  - [I want to see all protocol messages](#i-want-to-see-all-protocol-messages)
+- [References](#references)
+- [License](#license)
+- [Contribution](#contribution)
+
+## Install
+
+```console
+$ npm i @achingbrain/ssdp
+```
 
 Yet another SSDP implementation for node.js
 
 SSDP is a service discovery protocol that uses messages composed from HTTP-style headers sent over UDP.  It fulfills a similar role to mDNS but needs no extra libraries and is implemented completely in JavaScript.
 
 With SSDP a service will broadcast it's availability and respond to search messages over UDP and also present a description document that contains details of the capabilities it offers.  A client can then search for available services and use them as required.
-
-## Installation
-
-```sh
-npm install @achingbrain/ssdp
-```
 
 ## Usage
 
@@ -77,6 +96,7 @@ const advert = await bus.advertise({
 // stop advertising a service
 await advert.stop()
 ```
+
 For full options, see [lib/advertise/parse-options.js](lib/advertise/parse-options.js)
 
 ### Integrate with existing HTTP servers
@@ -334,9 +354,20 @@ Alternatively see [test/fixtures/all.js](test/fixtures/all.js)
 
 ## References
 
- * [LG SSDP discovery documentation](http://developer.lgappstv.com/TV_HELP/topic/lge.tvsdk.references.book/html/UDAP/UDAP/Discovery.htm)
- * [UPnP overview](http://jan.newmarch.name/internetdevices/upnp/upnp.html)
- * [UPnP device description](http://jan.newmarch.name/internetdevices/upnp/upnp-devices.html)
- * [UPnP Device Architecture v1.1](http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v1.1.pdf)
- * [diversario/node-ssdp](https://github.com/diversario/node-ssdp)
- * [Xedecimal/node-ssdp](https://www.npmjs.com/package/ssdp) (no longer maintained)
+- [LG SSDP discovery documentation](http://developer.lgappstv.com/TV_HELP/topic/lge.tvsdk.references.book/html/UDAP/UDAP/Discovery.htm)
+- [UPnP overview](http://jan.newmarch.name/internetdevices/upnp/upnp.html)
+- [UPnP device description](http://jan.newmarch.name/internetdevices/upnp/upnp-devices.html)
+- [UPnP Device Architecture v1.1](http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v1.1.pdf)
+- [diversario/node-ssdp](https://github.com/diversario/node-ssdp)
+- [Xedecimal/node-ssdp](https://www.npmjs.com/package/ssdp) (no longer maintained)
+
+## License
+
+Licensed under either of
+
+- Apache 2.0, ([LICENSE-APACHE](LICENSE-APACHE) / <http://www.apache.org/licenses/LICENSE-2.0>)
+- MIT ([LICENSE-MIT](LICENSE-MIT) / <http://opensource.org/licenses/MIT>)
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.

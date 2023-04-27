@@ -5,7 +5,7 @@ import type { NotfiyMessage, SSDP } from '../index.js'
 export const ALIVE = 'ssdp:alive'
 export const BYEBYE = 'ssdp:byebye'
 
-export function notify (ssdp: SSDP, message: NotfiyMessage) {
+export function notify (ssdp: SSDP, message: NotfiyMessage): void {
   if (message.LOCATION == null || message.USN == null || message.NT == null || message.NTS == null) {
     return
   }

@@ -2,13 +2,13 @@ import { createSocket } from 'dgram'
 import type { SSDP, SSDPSocket } from './index.js'
 
 export async function createSockets (ssdp: SSDP, signal: AbortSignal): Promise<SSDPSocket[]> {
-  return await Promise.all(
+  return Promise.all(
     ssdp.options.sockets.map(async options => {
-      return await new Promise<SSDPSocket>((resolve, reject) => {
+      return new Promise<SSDPSocket>((resolve, reject) => {
         const socket = createSocket({
           type: options.type,
           reuseAddr: true,
-          signal: signal
+          signal
         }, (buf, info) => {
           ssdp.emit('transport:incoming-message', buf, info)
         })

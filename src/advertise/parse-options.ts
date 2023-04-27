@@ -1,7 +1,7 @@
 import mergeOptions from 'merge-options'
 import xml2js from 'xml2js'
-import type { Advertisment, SSDP } from '../index.js'
 import type { Advert } from './index.js'
+import type { Advertisment, SSDP } from '../index.js'
 
 export function parseAdvertOptions (ssdp: SSDP, options: Advertisment): Advert {
   if (options == null) {
@@ -47,7 +47,7 @@ export function parseAdvertOptions (ssdp: SSDP, options: Advertisment): Advert {
   const details = opts.details
 
   opts.details = async () => {
-    return await new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       try {
         const builder = new xml2js.Builder()
         resolve(builder.buildObject(details))

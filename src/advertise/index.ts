@@ -1,9 +1,9 @@
-import type { Advertisment, SSDP } from '../index.js'
-import { adverts, CachedAdvert } from '../adverts.js'
-import { parseAdvertOptions } from './parse-options.js'
+import { adverts, type CachedAdvert } from '../adverts.js'
+import { BYEBYE, ALIVE } from '../commands/notify.js'
 import { broadcastAdvert } from './broadcast-advert.js'
 import { createLocation } from './create-location.js'
-import { BYEBYE, ALIVE } from '../commands/notify.js'
+import { parseAdvertOptions } from './parse-options.js'
+import type { Advertisment, SSDP } from '../index.js'
 
 export interface Advert {
   usn: string
@@ -20,7 +20,7 @@ export async function advertise (ssdp: SSDP, options: Advertisment): Promise<Cac
   const shutDownServers = await createLocation(ssdp, advert)
   let timeout: NodeJS.Timeout
 
-  const broadcast = () => {
+  const broadcast = (): void => {
     broadcastAdvert(ssdp, advert, ALIVE)
 
     timeout = setTimeout(broadcast, advert.interval)
