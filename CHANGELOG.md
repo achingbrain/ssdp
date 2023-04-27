@@ -1,3 +1,10 @@
+## [4.0.3](https://github.com/achingbrain/ssdp/compare/v4.0.2...v4.0.3) (2023-04-27)
+
+
+### Dependencies
+
+* update all project deps ([#45](https://github.com/achingbrain/ssdp/issues/45)) ([f7733c5](https://github.com/achingbrain/ssdp/commit/f7733c59183cef248f0366aee430bf1d27bf295a))
+
 ## [4.0.2](https://github.com/achingbrain/ssdp/compare/v4.0.1...v4.0.2) (2023-04-27)
 
 
