@@ -142,7 +142,7 @@
     "event-iterator": "^2.0.0",
     "freeport-promise": "^2.0.0",
     "merge-options": "^3.0.4",
-    "xml2js": "^0.5.0"
+    "xml2js": "^0.6.0"
   },
   "devDependencies": {
     "@types/sinon": "^10.0.14",
