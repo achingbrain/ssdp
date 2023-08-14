@@ -147,7 +147,7 @@
   "devDependencies": {
     "@types/sinon": "^10.0.14",
     "@types/xml2js": "^0.4.11",
-    "aegir": "^39.0.2",
+    "aegir": "^40.0.10",
     "it-first": "^3.0.1",
     "p-defer": "^4.0.0",
     "sinon": "^15.0.4"
