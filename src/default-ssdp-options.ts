@@ -1,4 +1,3 @@
-
 import { webcrypto as crypto } from 'crypto' // remove when having crypto global
 import { createRequire } from 'module'
 import mergeOptions from 'merge-options'
