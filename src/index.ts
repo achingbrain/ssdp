@@ -42,29 +42,29 @@ export interface NotfiyMessage {
   USN: string
   NT: string
   NTS: 'ssdp:alive' | 'ssdp:byebye'
-  ttl: () => number
+  ttl(): number
 }
 
 export interface SearchMessage {
   LOCATION: string
   USN: string
   ST: string
-  ttl: () => number
+  ttl(): number
 }
 
 interface SSDPEvents {
-  'transport:incoming-message': (buffer: Buffer, from: NetworkAddress) => void
-  'transport:outgoing-message': (socket: SSDPSocket, buffer: Buffer, to: NetworkAddress) => void
-  'ssdp:send-message': (status: string, headers: Record<string, any>, to?: NetworkAddress) => void
-  'ssdp:m-search': (message: SearchMessage, from: NetworkAddress) => void
-  'ssdp:notify': (message: NotfiyMessage, from: NetworkAddress) => void
-  'ssdp:search-response': (message: SearchMessage, from: NetworkAddress) => void
+  'transport:incoming-message'(buffer: Buffer, from: NetworkAddress): void
+  'transport:outgoing-message'(socket: SSDPSocket, buffer: Buffer, to: NetworkAddress): void
+  'ssdp:send-message'(status: string, headers: Record<string, any>, to?: NetworkAddress): void
+  'ssdp:m-search'(message: SearchMessage, from: NetworkAddress): void
+  'ssdp:notify'(message: NotfiyMessage, from: NetworkAddress): void
+  'ssdp:search-response'(message: SearchMessage, from: NetworkAddress): void
 
-  'service:discover': (service: Service) => void
-  'service:update': (service: Service) => void
-  'service:remove': (usn: string) => void
+  'service:discover'(service: Service): void
+  'service:update'(service: Service): void
+  'service:remove'(usn: string): void
 
-  'error': (err: Error) => void
+  'error'(err: Error): void
 }
 
 export interface Service<DeviceDescription = Record<string, any>> {
@@ -101,25 +101,25 @@ export interface SSDP {
    */
   options: SSDPOptions
 
-  start: () => Promise<void>
-  stop: () => Promise<void>
+  start(): Promise<void>
+  stop(): Promise<void>
 
-  advertise: (advert: Advertisment) => Promise<CachedAdvert>
-  discover: <Details = Record<string, any>> (serviceType?: string) => AsyncIterable<Service<Details>>
+  advertise(advert: Advertisment): Promise<CachedAdvert>
+  discover<Details = Record<string, any>>(serviceType?: string): AsyncIterable<Service<Details>>
 
   // events
-  on: <U extends keyof SSDPEvents>(
+  on<U extends keyof SSDPEvents>(
     event: U, listener: SSDPEvents[U]
-  ) => this
-  off: <U extends keyof SSDPEvents>(
+  ): this
+  off<U extends keyof SSDPEvents>(
     event: U, listener: SSDPEvents[U]
-  ) => this
-  once: <U extends keyof SSDPEvents>(
+  ): this
+  once<U extends keyof SSDPEvents>(
     event: U, listener: SSDPEvents[U]
-  ) => this
-  emit: <U extends keyof SSDPEvents>(
+  ): this
+  emit<U extends keyof SSDPEvents>(
     event: U, ...args: Parameters<SSDPEvents[U]>
-  ) => boolean
+  ): boolean
 }
 
 class SSDPImpl extends EventEmitter implements SSDP {

@@ -12,7 +12,7 @@ export interface Advert {
   ipv4: boolean
   ipv6: boolean
   location: Record<string, string>
-  details: () => Promise<any>
+  details(): Promise<any>
 }
 
 export async function advertise (ssdp: SSDP, options: Advertisment): Promise<CachedAdvert> {
