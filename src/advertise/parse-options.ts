@@ -12,7 +12,7 @@ export function parseAdvertOptions (ssdp: SSDP, options: Advertisment): Advert {
     throw new Error('Advert should have a usn property')
   }
 
-  const opts: Advert = mergeOptions(options, {
+  const opts: Advert = mergeOptions({
     usn: options.usn,
     interval: 10000,
     ttl: 1800000,
@@ -42,7 +42,7 @@ export function parseAdvertOptions (ssdp: SSDP, options: Advertisment): Advert {
         presentationURL: 'index.html'
       }
     }
-  })
+  }, options)
 
   const details = opts.details
 
