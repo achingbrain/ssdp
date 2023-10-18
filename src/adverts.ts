@@ -2,7 +2,7 @@ import type { Advert } from './advertise/index.js'
 
 export interface CachedAdvert {
   service: Advert
-  stop: () => Promise<void>
+  stop(): Promise<void>
 }
 
 class Adverts {
