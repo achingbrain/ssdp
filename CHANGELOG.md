@@ -1,3 +1,10 @@
+## [4.0.5](https://github.com/achingbrain/ssdp/compare/v4.0.4...v4.0.5) (2023-10-18)
+
+
+### Dependencies
+
+* **dev:** bump aegir from 39.0.13 to 41.0.5 ([#58](https://github.com/achingbrain/ssdp/issues/58)) ([9473fbd](https://github.com/achingbrain/ssdp/commit/9473fbd074ab43a4cf3ee057e44e634178d8a66a))
+
 ## [4.0.4](https://github.com/achingbrain/ssdp/compare/v4.0.3...v4.0.4) (2023-04-27)
 
 
