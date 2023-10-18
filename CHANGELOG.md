@@ -1,3 +1,11 @@
+## [4.0.6](https://github.com/achingbrain/ssdp/compare/v4.0.5...v4.0.6) (2023-10-18)
+
+
+### Dependencies
+
+* bump xml2js from 0.5.0 to 0.6.2 ([#52](https://github.com/achingbrain/ssdp/issues/52)) ([e87422c](https://github.com/achingbrain/ssdp/commit/e87422c1f04728adc18e5f0568ab5814986e7754))
+* **dev:** bump sinon from 15.2.0 to 16.1.0 ([#59](https://github.com/achingbrain/ssdp/issues/59)) ([13241f9](https://github.com/achingbrain/ssdp/commit/13241f9fdd2de5b0034244c41558fba449a5bb35))
+
 ## [4.0.5](https://github.com/achingbrain/ssdp/compare/v4.0.4...v4.0.5) (2023-10-18)
 
 
