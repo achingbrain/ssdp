@@ -142,7 +142,7 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
-    "@types/sinon": "^10.0.14",
+    "@types/sinon": "^17.0.1",
     "@types/xml2js": "^0.4.11",
     "aegir": "^41.0.5",
     "it-first": "^3.0.1",
