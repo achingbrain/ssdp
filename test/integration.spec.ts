@@ -28,7 +28,7 @@ describe('ssdp', () => {
         type: 'udp4',
         maxHops: 4,
         broadcast: {
-          address: '0.0.0.0',
+          address: '239.255.255.250',
           port: busPort
         },
         bind: {

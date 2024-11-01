@@ -2,7 +2,7 @@ import mergeOptions from 'merge-options'
 import type { SSDPSocketOptions } from './index.js'
 
 export function defaultSocketOptions (options?: Partial<SSDPSocketOptions>): SSDPSocketOptions {
-  return mergeOptions(options ?? {}, {
+  return mergeOptions({
     type: 'udp4', // or 'udp6'
     broadcast: {
       address: '239.255.255.250', // or 'FF02::C'
@@ -13,5 +13,5 @@ export function defaultSocketOptions (options?: Partial<SSDPSocketOptions>): SSD
       port: 1900
     },
     maxHops: 4
-  })
+  }, options)
 }

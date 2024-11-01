@@ -1,11 +1,11 @@
 import { cache } from '../cache.js'
 import { resolveService } from './resolve-service.js'
-import type { NotfiyMessage, SSDP } from '../index.js'
+import type { NotifyMessage, SSDP } from '../index.js'
 
 export const ALIVE = 'ssdp:alive'
 export const BYEBYE = 'ssdp:byebye'
 
-export function notify (ssdp: SSDP, message: NotfiyMessage): void {
+export function notify (ssdp: SSDP, message: NotifyMessage): void {
   if (message.LOCATION == null || message.USN == null || message.NT == null || message.NTS == null) {
     return
   }

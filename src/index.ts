@@ -37,7 +37,7 @@ export interface SSDPSocket extends Socket {
   options: SSDPSocketOptions
 }
 
-export interface NotfiyMessage {
+export interface NotifyMessage {
   LOCATION: string
   USN: string
   NT: string
@@ -57,7 +57,7 @@ interface SSDPEvents {
   'transport:outgoing-message'(socket: SSDPSocket, buffer: Buffer, to: NetworkAddress): void
   'ssdp:send-message'(status: string, headers: Record<string, any>, to?: NetworkAddress): void
   'ssdp:m-search'(message: SearchMessage, from: NetworkAddress): void
-  'ssdp:notify'(message: NotfiyMessage, from: NetworkAddress): void
+  'ssdp:notify'(message: NotifyMessage, from: NetworkAddress): void
   'ssdp:search-response'(message: SearchMessage, from: NetworkAddress): void
 
   'service:discover'(service: Service): void
@@ -76,8 +76,42 @@ export interface Service<DeviceDescription = Record<string, any>> {
 }
 
 export interface Advertisment {
+  /**
+   * A unique service name for the advertisement
+   */
   usn: string
+
+  /**
+   * Advertisment details. Will be transformed into XML and should follow the
+   * urn:schemas-upnp-org:device-1-0 schema.
+   */
   details: Record<string, any> | (() => Promise<Record<string, any>>)
+
+  /**
+   * An optional amount in ms which is the frequency to advertise the service
+   */
+  interval?: number
+
+  /**
+   * An optional amount in ms which is how long the advert should be cached for
+   */
+  ttl?: number
+
+  /**
+   * Whether to broadcast the advert over IPv4 (default: true)
+   */
+  ipv4?: boolean
+
+  /**
+   * Whether to broadcast the advert over IPv6 (default: true)
+   */
+  ipv6?: boolean
+
+  /**
+   * Where the description document(s) are available - omit to have an http
+   * server automatically created
+   */
+  location?: { udp4: string, udp6: string }
 }
 
 export interface SSDP {
