@@ -12,6 +12,10 @@
   "bugs": {
     "url": "https://github.com/achingbrain/ssdp/issues"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "keywords": [
     "device",
     "media",
@@ -42,7 +46,7 @@
   },
   "release": {
     "branches": [
-      "master"
+      "main"
     ],
     "plugins": [
       [

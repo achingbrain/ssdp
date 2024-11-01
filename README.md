@@ -1,9 +1,15 @@
-# @achingbrain/ssdp <!-- omit in toc -->
+# @achingbrain/ssdp
 
 [![codecov](https://img.shields.io/codecov/c/github/achingbrain/ssdp.svg?style=flat-square)](https://codecov.io/gh/achingbrain/ssdp)
-[![CI](https://img.shields.io/github/actions/workflow/status/achingbrain/ssdp/js-test-and-release.yml?branch=master\&style=flat-square)](https://github.com/achingbrain/ssdp/actions/workflows/js-test-and-release.yml?query=branch%3Amaster)
+[![CI](https://img.shields.io/github/actions/workflow/status/achingbrain/ssdp/js-test-and-release.yml?branch=main\&style=flat-square)](https://github.com/achingbrain/ssdp/actions/workflows/js-test-and-release.yml?query=branch%3Amain)
 
 > Yet another SSDP implementation for node.js
+
+# Install
+
+```console
+$ npm i @achingbrain/ssdp
+```
 
 ## Table of contents <!-- omit in toc -->
 
@@ -22,18 +28,6 @@
 - [References](#references)
 - [License](#license)
 - [Contribution](#contribution)
-
-## Install
-
-```console
-$ npm i @achingbrain/ssdp
-```
-
-Yet another SSDP implementation for node.js
-
-SSDP is a service discovery protocol that uses messages composed from HTTP-style headers sent over UDP.  It fulfills a similar role to mDNS but needs no extra libraries and is implemented completely in JavaScript.
-
-With SSDP a service will broadcast it's availability and respond to search messages over UDP and also present a description document that contains details of the capabilities it offers.  A client can then search for available services and use them as required.
 
 ## Usage
 
@@ -361,13 +355,13 @@ Alternatively see [test/fixtures/all.js](test/fixtures/all.js)
 - [diversario/node-ssdp](https://github.com/diversario/node-ssdp)
 - [Xedecimal/node-ssdp](https://www.npmjs.com/package/ssdp) (no longer maintained)
 
-## License
+# License
 
 Licensed under either of
 
-- Apache 2.0, ([LICENSE-APACHE](LICENSE-APACHE) / <http://www.apache.org/licenses/LICENSE-2.0>)
-- MIT ([LICENSE-MIT](LICENSE-MIT) / <http://opensource.org/licenses/MIT>)
+- Apache 2.0, ([LICENSE-APACHE](https://github.com/achingbrain/ssdp/LICENSE-APACHE) / <http://www.apache.org/licenses/LICENSE-2.0>)
+- MIT ([LICENSE-MIT](https://github.com/achingbrain/ssdp/LICENSE-MIT) / <http://opensource.org/licenses/MIT>)
 
-## Contribution
+# Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
