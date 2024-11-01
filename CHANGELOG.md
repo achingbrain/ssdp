@@ -1,3 +1,9 @@
+## [4.1.0](https://github.com/achingbrain/ssdp/compare/v4.0.10...v4.1.0) (2024-11-01)
+
+### Features
+
+* accept abort signal when discovering services ([#76](https://github.com/achingbrain/ssdp/issues/76)) ([3f6d84f](https://github.com/achingbrain/ssdp/commit/3f6d84f1faab083529a43aa1b0b402c91b8d9c17))
+
 ## [4.0.10](https://github.com/achingbrain/ssdp/compare/v4.0.9...v4.0.10) (2024-11-01)
 
 ### Bug Fixes
