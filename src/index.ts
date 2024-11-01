@@ -329,7 +329,7 @@
 import { EventEmitter } from 'events'
 import { EventIterator } from 'event-iterator'
 import { advertise } from './advertise/index.js'
-import { adverts, type CachedAdvert } from './adverts.js'
+import { adverts } from './adverts.js'
 import { notify } from './commands/notify.js'
 import { search } from './commands/search.js'
 import { createSockets } from './create-sockets.js'
@@ -338,7 +338,11 @@ import { discover } from './discover/index.js'
 import { searchResponse } from './discover/search-response.js'
 import { parseSsdpMessage } from './parse-ssdp-message.js'
 import { sendSsdpMessage } from './send-ssdp-message.js'
+import type { CachedAdvert } from './adverts.js'
 import type { Socket } from 'dgram'
+
+export type { CachedAdvert } from './adverts.js'
+export type { Advert } from './advertise/index.js'
 
 export interface NetworkAddress {
   address: string
@@ -380,7 +384,7 @@ export interface SearchMessage {
   ttl(): number
 }
 
-interface SSDPEvents {
+export interface SSDPEvents {
   'transport:incoming-message'(buffer: Buffer, from: NetworkAddress): void
   'transport:outgoing-message'(socket: SSDPSocket, buffer: Buffer, to: NetworkAddress): void
   'ssdp:send-message'(status: string, headers: Record<string, any>, to?: NetworkAddress): void
