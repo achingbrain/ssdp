@@ -326,8 +326,8 @@
  * - [Xedecimal/node-ssdp](https://www.npmjs.com/package/ssdp) (no longer maintained)
  */
 
-import { AbortError } from 'abort-error'
 import { EventEmitter } from 'events'
+import { AbortError } from 'abort-error'
 import { EventIterator } from 'event-iterator'
 import { advertise } from './advertise/index.js'
 import { adverts } from './adverts.js'
