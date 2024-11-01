@@ -141,6 +141,7 @@
     "docs": "aegir docs"
   },
   "dependencies": {
+    "abort-error": "^1.0.0",
     "event-iterator": "^2.0.0",
     "freeport-promise": "^2.0.0",
     "merge-options": "^3.0.4",
