@@ -1,9 +1,9 @@
 import mergeOptions from 'merge-options'
 import xml2js from 'xml2js'
 import type { Advert } from './index.js'
-import type { Advertisment, SSDP } from '../index.js'
+import type { Advertisement, SSDP } from '../index.js'
 
-export function parseAdvertOptions (ssdp: SSDP, options: Advertisment): Advert {
+export function parseAdvertOptions (ssdp: SSDP, options: Advertisement): Advert {
   if (options == null) {
     throw new Error('Empty advert passed')
   }

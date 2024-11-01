@@ -3,7 +3,7 @@ import { BYEBYE, ALIVE } from '../commands/notify.js'
 import { broadcastAdvert } from './broadcast-advert.js'
 import { createLocation } from './create-location.js'
 import { parseAdvertOptions } from './parse-options.js'
-import type { Advertisment, SSDP } from '../index.js'
+import type { Advertisement, SSDP } from '../index.js'
 
 export interface Advert {
   usn: string
@@ -15,7 +15,7 @@ export interface Advert {
   details(): Promise<any>
 }
 
-export async function advertise (ssdp: SSDP, options: Advertisment): Promise<CachedAdvert> {
+export async function advertise (ssdp: SSDP, options: Advertisement): Promise<CachedAdvert> {
   const advert = parseAdvertOptions(ssdp, options)
   const shutDownServers = await createLocation(ssdp, advert)
   let timeout: NodeJS.Timeout

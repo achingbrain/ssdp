@@ -137,7 +137,8 @@
     "test": "aegir test -t node -t electron-main",
     "test:node": "aegir test -t node --cov",
     "test:electron-main": "aegir test -t electron-main",
-    "release": "aegir release"
+    "release": "aegir release",
+    "docs": "aegir docs"
   },
   "dependencies": {
     "event-iterator": "^2.0.0",
