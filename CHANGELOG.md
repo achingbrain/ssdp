@@ -1,3 +1,13 @@
+## [4.0.10](https://github.com/achingbrain/ssdp/compare/v4.0.9...v4.0.10) (2024-11-01)
+
+### Bug Fixes
+
+* update project ([ec97eca](https://github.com/achingbrain/ssdp/commit/ec97eca1fa82c6efad298051fe9a1275337afcb7))
+
+### Documentation
+
+* update readme ([898076a](https://github.com/achingbrain/ssdp/commit/898076a76c0ad5f5c8201ba2c12ffa4c553ea918))
+
 ## [4.0.9](https://github.com/achingbrain/ssdp/compare/v4.0.8...v4.0.9) (2024-11-01)
 
 ### Bug Fixes
