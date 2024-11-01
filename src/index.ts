@@ -37,7 +37,7 @@ export interface SSDPSocket extends Socket {
   options: SSDPSocketOptions
 }
 
-export interface NotfiyMessage {
+export interface NotifyMessage {
   LOCATION: string
   USN: string
   NT: string
@@ -57,7 +57,7 @@ interface SSDPEvents {
   'transport:outgoing-message'(socket: SSDPSocket, buffer: Buffer, to: NetworkAddress): void
   'ssdp:send-message'(status: string, headers: Record<string, any>, to?: NetworkAddress): void
   'ssdp:m-search'(message: SearchMessage, from: NetworkAddress): void
-  'ssdp:notify'(message: NotfiyMessage, from: NetworkAddress): void
+  'ssdp:notify'(message: NotifyMessage, from: NetworkAddress): void
   'ssdp:search-response'(message: SearchMessage, from: NetworkAddress): void
 
   'service:discover'(service: Service): void
