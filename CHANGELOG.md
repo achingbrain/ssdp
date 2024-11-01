@@ -1,3 +1,24 @@
+## [4.0.7](https://github.com/achingbrain/ssdp/compare/v4.0.6...v4.0.7) (2024-11-01)
+
+### Dependencies
+
+* **dev:** bump aegir from 41.3.5 to 45.0.1 ([#74](https://github.com/achingbrain/ssdp/issues/74)) ([414d179](https://github.com/achingbrain/ssdp/commit/414d1799a5df0479dfdb2a2ee7f289d2da98eeb7))
+
+## [4.0.6](https://github.com/achingbrain/ssdp/compare/v4.0.5...v4.0.6) (2023-10-18)
+
+
+### Dependencies
+
+* bump xml2js from 0.5.0 to 0.6.2 ([#52](https://github.com/achingbrain/ssdp/issues/52)) ([e87422c](https://github.com/achingbrain/ssdp/commit/e87422c1f04728adc18e5f0568ab5814986e7754))
+* **dev:** bump sinon from 15.2.0 to 16.1.0 ([#59](https://github.com/achingbrain/ssdp/issues/59)) ([13241f9](https://github.com/achingbrain/ssdp/commit/13241f9fdd2de5b0034244c41558fba449a5bb35))
+
+## [4.0.5](https://github.com/achingbrain/ssdp/compare/v4.0.4...v4.0.5) (2023-10-18)
+
+
+### Dependencies
+
+* **dev:** bump aegir from 39.0.13 to 41.0.5 ([#58](https://github.com/achingbrain/ssdp/issues/58)) ([9473fbd](https://github.com/achingbrain/ssdp/commit/9473fbd074ab43a4cf3ee057e44e634178d8a66a))
+
 ## [4.0.4](https://github.com/achingbrain/ssdp/compare/v4.0.3...v4.0.4) (2023-04-27)
 
 

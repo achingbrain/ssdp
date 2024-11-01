@@ -1,6 +1,6 @@
 {
   "name": "@achingbrain/ssdp",
-  "version": "4.0.4",
+  "version": "4.0.7",
   "description": "Yet another SSDP implementation for node.js",
   "author": "Alex Potsides",
   "license": "Apache-2.0 OR MIT",
@@ -12,6 +12,10 @@
   "bugs": {
     "url": "https://github.com/achingbrain/ssdp/issues"
   },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "keywords": [
     "device",
     "media",
@@ -19,10 +23,6 @@
     "ssdp",
     "upnp"
   ],
-  "engines": {
-    "node": ">=16.0.0",
-    "npm": ">=7.0.0"
-  },
   "type": "module",
   "types": "./dist/src/index.d.ts",
   "files": [
@@ -40,12 +40,13 @@
   "eslintConfig": {
     "extends": "ipfs",
     "parserOptions": {
+      "project": true,
       "sourceType": "module"
     }
   },
   "release": {
     "branches": [
-      "master"
+      "main"
     ],
     "plugins": [
       [
@@ -142,14 +143,14 @@
     "event-iterator": "^2.0.0",
     "freeport-promise": "^2.0.0",
     "merge-options": "^3.0.4",
-    "xml2js": "^0.5.0"
+    "xml2js": "^0.6.2"
   },
   "devDependencies": {
     "@types/sinon": "^10.0.14",
     "@types/xml2js": "^0.4.11",
-    "aegir": "^39.0.2",
+    "aegir": "^45.0.1",
     "it-first": "^3.0.1",
     "p-defer": "^4.0.0",
-    "sinon": "^15.0.4"
+    "sinon": "^16.1.0"
   }
 }

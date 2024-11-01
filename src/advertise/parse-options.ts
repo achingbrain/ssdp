@@ -51,8 +51,8 @@ export function parseAdvertOptions (ssdp: SSDP, options: Advertisment): Advert {
       try {
         const builder = new xml2js.Builder()
         resolve(builder.buildObject(details))
-      } catch (error) {
-        reject(error)
+      } catch (error: any) {
+        reject(error as Error)
       }
     })
   }
