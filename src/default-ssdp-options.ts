@@ -10,7 +10,7 @@ const { name, version } = req('../../package.json')
 const DEFAULT_SSDP_SIGNATURE = `node.js/${process.version.substring(1)} UPnP/1.1 ${name}/${version}`
 
 export function defaultSsdpOptions (options?: Partial<SSDPOptions>): SSDPOptions {
-  return mergeOptions(options ?? {}, {
+  return mergeOptions({
     usn: `uuid:${crypto.randomUUID()}`, // eslint-disable-line @typescript-eslint/restrict-template-expressions
     signature: DEFAULT_SSDP_SIGNATURE,
     sockets: [{}].map(defaultSocketOptions),
@@ -18,5 +18,5 @@ export function defaultSsdpOptions (options?: Partial<SSDPOptions>): SSDPOptions
       times: 5,
       interval: 5000
     }
-  })
+  }, options)
 }
