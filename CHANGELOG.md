@@ -1,3 +1,9 @@
+## [4.0.9](https://github.com/achingbrain/ssdp/compare/v4.0.8...v4.0.9) (2024-11-01)
+
+### Bug Fixes
+
+* override advertisement details ([#60](https://github.com/achingbrain/ssdp/issues/60)) ([13cdb91](https://github.com/achingbrain/ssdp/commit/13cdb91d9913141cd410a6959a8b2294c1dddbd0)), closes [#49](https://github.com/achingbrain/ssdp/issues/49)
+
 ## [4.0.8](https://github.com/achingbrain/ssdp/compare/v4.0.7...v4.0.8) (2024-11-01)
 
 ### Bug Fixes
