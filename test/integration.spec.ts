@@ -368,4 +368,44 @@ describe('ssdp', () => {
     expect(updatedService).to.have.property('uniqueServiceName', 'uuid:2f402f80-da50-11e1-9b23-00178809ea66')
     expect(updatedService).to.have.nested.property('details.foo', 'bar')
   })
+
+  it('should abort before discovering services', async () => {
+    const usn = 'my-service-type'
+    const controller = new AbortController()
+    controller.abort()
+
+    await expect(first(bus.discover({
+      serviceType: usn,
+      signal: controller.signal
+    }))).to.eventually.be.rejected
+      .with.property('name', 'AbortError')
+  })
+
+  it('should during discovery', async () => {
+    const usn = 'my-service-type'
+    const controller = new AbortController()
+
+    const stream = bus.discover({
+      serviceType: usn,
+      signal: controller.signal
+    })
+
+    queueMicrotask(() => {
+      bus.emit('service:discover', {
+        location: new URL('http://example.com'),
+        details: {},
+        expires: 100,
+        serviceType: usn,
+        uniqueServiceName: usn
+      })
+    })
+
+    await expect((async () => {
+      for await (const _ of stream) {
+        return
+        controller.abort()
+      }
+    })()).to.eventually.be.rejected
+      .with.property('name', 'AbortError')
+  })
 })

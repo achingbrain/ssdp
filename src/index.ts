@@ -326,6 +326,7 @@
  * - [Xedecimal/node-ssdp](https://www.npmjs.com/package/ssdp) (no longer maintained)
  */
 
+import { AbortError } from 'abort-error'
 import { EventEmitter } from 'events'
 import { EventIterator } from 'event-iterator'
 import { advertise } from './advertise/index.js'
@@ -339,6 +340,7 @@ import { searchResponse } from './discover/search-response.js'
 import { parseSsdpMessage } from './parse-ssdp-message.js'
 import { sendSsdpMessage } from './send-ssdp-message.js'
 import type { CachedAdvert } from './adverts.js'
+import type { AbortOptions } from 'abort-error'
 import type { Socket } from 'dgram'
 
 export type { CachedAdvert } from './adverts.js'
@@ -446,6 +448,13 @@ export interface Advertisement {
   location?: { udp4: string, udp6: string }
 }
 
+export interface DiscoverOptions extends AbortOptions {
+  /**
+   * The service type to discover
+   */
+  serviceType?: string
+}
+
 export interface SSDP {
   /**
    * Unique device name - identifies the device and must the same over time for a specific device instance
@@ -471,6 +480,11 @@ export interface SSDP {
   stop(): Promise<void>
 
   advertise(advert: Advertisement): Promise<CachedAdvert>
+  discover<Details = Record<string, any>>(options?: DiscoverOptions): AsyncGenerator<Service<Details>>
+
+  /**
+   * @deprecated Pass`DiscoverOptions` instead
+   */
   discover<Details = Record<string, any>>(serviceType?: string): AsyncIterable<Service<Details>>
 
   // events
@@ -537,11 +551,14 @@ class SSDPImpl extends EventEmitter implements SSDP {
     return advertise(this, advert)
   }
 
-  async * discover <Details = Record<string, any>> (serviceType?: string): AsyncGenerator<any, void, any> {
+  async * discover <Details = Record<string, any>> (serviceType?: string | DiscoverOptions): AsyncGenerator<any, void, any> {
+    const opts: DiscoverOptions | undefined = typeof serviceType === 'string' ? { serviceType } : serviceType
+    opts?.signal?.throwIfAborted()
+
     const iterator = new EventIterator<Service<Details>>(
-      ({ push }) => {
+      ({ push, fail }) => {
         const listener = (service: Service<Details>): void => {
-          if (serviceType != null && service.serviceType !== serviceType) {
+          if (opts != null && service.serviceType !== opts.serviceType) {
             return
           }
 
@@ -550,13 +567,19 @@ class SSDPImpl extends EventEmitter implements SSDP {
 
         this.addListener('service:discover', listener)
 
+        const abortListener = (): void => {
+          fail(new AbortError())
+        }
+        opts?.signal?.addEventListener('abort', abortListener)
+
         return () => {
           this.removeListener('service:discover', listener)
+          opts?.signal?.removeEventListener('abort', abortListener)
         }
       }
     )
 
-    discover(this, serviceType)
+    discover(this, opts?.serviceType)
 
     yield * iterator
   }

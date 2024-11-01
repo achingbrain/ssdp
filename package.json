@@ -141,9 +141,11 @@
     "docs": "aegir docs"
   },
   "dependencies": {
+    "abort-error": "^1.0.0",
     "event-iterator": "^2.0.0",
     "freeport-promise": "^2.0.0",
     "merge-options": "^3.0.4",
+    "race-signal": "^1.1.0",
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
