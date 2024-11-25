@@ -1,3 +1,9 @@
+## [4.1.1](https://github.com/achingbrain/ssdp/compare/v4.1.0...v4.1.1) (2024-11-25)
+
+### Bug Fixes
+
+* remove event-emitter dep ([#77](https://github.com/achingbrain/ssdp/issues/77)) ([4912e1d](https://github.com/achingbrain/ssdp/commit/4912e1d729f8cf2c067e447d75b727898e003817))
+
 ## [4.1.0](https://github.com/achingbrain/ssdp/compare/v4.0.10...v4.1.0) (2024-11-01)
 
 ### Features
