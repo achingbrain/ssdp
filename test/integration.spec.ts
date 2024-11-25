@@ -381,7 +381,7 @@ describe('ssdp', () => {
       .with.property('name', 'AbortError')
   })
 
-  it('should during discovery', async () => {
+  it('should abort during discovery', async () => {
     const usn = 'my-service-type'
     const controller = new AbortController()
 
