@@ -5,7 +5,7 @@ export function defaultSocketOptions (options?: Partial<SSDPSocketOptions>): SSD
   return mergeOptions({
     type: 'udp4', // or 'udp6'
     broadcast: {
-      address: '239.255.255.250', // or 'FF02::C'
+      address: '239.255.255.250', // or 'FF05::C'
       port: 1900
     },
     bind: {

@@ -1,26 +1,5 @@
-import type { NetworkAddress, SSDP, SSDPSocket } from './index.js'
-
-function isIpv4Address (address: string): boolean {
-  const parts = address.trim().split('.')
-
-  if (parts.length !== 4) {
-    return false
-  }
-
-  for (let i = 0; i < parts.length; i++) {
-    const octet = parseInt(parts[i], 10)
-
-    if (octet < 0 || octet > 255) {
-      return false
-    }
-  }
-
-  return true
-}
-
-const addressFamilyMismatch = (remote: NetworkAddress, socket: SSDPSocket): boolean => {
-  return !(socket.type === 'udp4' && isIpv4Address(remote.address))
-}
+import { addressFamilyMismatch } from './utils.js'
+import type { NetworkAddress, SSDP } from './index.js'
 
 export function sendSsdpMessage (ssdp: SSDP, status: string, headers: Record<string, string>, remote: NetworkAddress): void {
   Promise.all(
@@ -46,7 +25,14 @@ export function sendSsdpMessage (ssdp: SSDP, status: string, headers: Record<str
 
         if (!status.startsWith('HTTP/1.1')) {
           // not a response so insert the host header
-          message.push(`HOST: ${socket.options.broadcast.address}:${socket.options.broadcast.port}`)
+          let host = socket.options.broadcast.address
+
+          if (socket.type === 'udp6') {
+            // need to wrap IPv6 addrs in `[...]` because they can contain `:`
+            host = `[${socket.options.broadcast.address}]`
+          }
+
+          message.push(`HOST: ${host}:${socket.options.broadcast.port}`)
         }
 
         Object.keys(headers).forEach(function (header) {
