@@ -1,3 +1,10 @@
+## [4.1.3](https://github.com/achingbrain/ssdp/compare/v4.1.2...v4.1.3) (2024-11-27)
+
+### Dependencies
+
+* **dev:** bump @types/sinon from 10.0.20 to 17.0.3 ([#68](https://github.com/achingbrain/ssdp/issues/68)) ([355d7a1](https://github.com/achingbrain/ssdp/commit/355d7a177e905504c45d065dbd5a889a1defe320))
+* **dev:** bump sinon from 16.1.3 to 19.0.2 ([#75](https://github.com/achingbrain/ssdp/issues/75)) ([6428cd1](https://github.com/achingbrain/ssdp/commit/6428cd10529847bb0d5475e57ff711b58acd9527))
+
 ## [4.1.2](https://github.com/achingbrain/ssdp/compare/v4.1.1...v4.1.2) (2024-11-27)
 
 ### Bug Fixes
