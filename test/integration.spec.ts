@@ -17,7 +17,10 @@ describe('ssdp', () => {
   let clock: sinon.SinonFakeTimers
 
   beforeEach(async () => {
-    clock = sinon.useFakeTimers(new Date())
+    clock = sinon.useFakeTimers({
+      now: new Date(),
+      shouldAdvanceTime: true
+    })
     details = {
       foo: 'bar'
     }
