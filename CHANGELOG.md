@@ -1,3 +1,9 @@
+## [4.1.2](https://github.com/achingbrain/ssdp/compare/v4.1.1...v4.1.2) (2024-11-27)
+
+### Bug Fixes
+
+* wrap IPv6 address in square brackets ([#78](https://github.com/achingbrain/ssdp/issues/78)) ([3c17e61](https://github.com/achingbrain/ssdp/commit/3c17e61e9057d2338c3408406d6e3071970edda5))
+
 ## [4.1.1](https://github.com/achingbrain/ssdp/compare/v4.1.0...v4.1.1) (2024-11-25)
 
 ### Bug Fixes
