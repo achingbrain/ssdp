@@ -1,6 +1,6 @@
 import { cache } from '../cache.js'
 import { resolveLocation } from './resolve-location.js'
-import type { SSDP } from '../index.js'
+import type { SSDP, Service } from '../index.js'
 
 export async function resolveService (ssdp: SSDP, usn: string, st: string, location: string, ttl: number): Promise<void> {
   // all arguments are required
@@ -9,7 +9,11 @@ export async function resolveService (ssdp: SSDP, usn: string, st: string, locat
   }
 
   let newService = false
-  let service = cache.getService(st, usn)
+  let service: Service<Record<string, any>> | undefined
+
+  if (ssdp.options.cache) {
+    service = cache.getService(st, usn)
+  }
 
   if (service == null) {
     newService = true
@@ -23,7 +27,9 @@ export async function resolveService (ssdp: SSDP, usn: string, st: string, locat
       uniqueServiceName: usn
     }
 
-    cache.cacheService(service)
+    if (ssdp.options.cache) {
+      cache.cacheService(service)
+    }
   }
 
   if (!newService) {
@@ -43,7 +49,9 @@ export async function resolveService (ssdp: SSDP, usn: string, st: string, locat
     service.details = await resolveLocation(location)
     service.expires = Date.now() + ttl
 
-    cache.cacheService(service)
+    if (ssdp.options.cache) {
+      cache.cacheService(service)
+    }
 
     if (oldDetails === JSON.stringify(service.details)) {
       // details have not changed, ignore the notify
@@ -56,8 +64,10 @@ export async function resolveService (ssdp: SSDP, usn: string, st: string, locat
       ssdp.emit('service:update', service)
     }
   } catch (err: any) {
-    // remove it so we can try again later
-    cache.deleteService(st, usn)
+    if (ssdp.options.cache) {
+      // remove it so we can try again later
+      cache.deleteService(st, usn)
+    }
 
     ssdp.emit('error', err)
   }
