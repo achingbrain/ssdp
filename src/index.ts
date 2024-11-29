@@ -483,6 +483,16 @@ export interface DiscoverOptions extends AbortOptions {
    * The service type to discover
    */
   serviceType?: string
+
+  /**
+   * By default a single `M-SEARCH` message is broadcast at the beginning of
+   * discovery.
+   *
+   * If devices on your network sometimes don't appear in search results, try
+   * passing a value here, the `M-SEARCH` message will be re-broadcast on that
+   * interval.
+   */
+  searchInterval?: number
 }
 
 export interface SSDP {
@@ -586,8 +596,20 @@ class SSDPImpl extends EventEmitter implements SSDP {
 
     discover(this, opts?.serviceType)
 
-    for await (const [service] of on(this, 'service:discover', opts)) {
-      yield service
+    let interval: ReturnType<typeof globalThis.setInterval> | undefined
+
+    if (opts?.searchInterval != null) {
+      interval = setInterval(() => {
+        discover(this, opts?.serviceType)
+      }, opts.searchInterval)
+    }
+
+    try {
+      for await (const [service] of on(this, 'service:discover', opts)) {
+        yield service
+      }
+    } finally {
+      clearInterval(interval)
     }
   }
 }
