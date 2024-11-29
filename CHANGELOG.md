@@ -1,3 +1,9 @@
+## [4.2.1](https://github.com/achingbrain/ssdp/compare/v4.2.0...v4.2.1) (2024-11-29)
+
+### Bug Fixes
+
+* survive port mapping failures ([#81](https://github.com/achingbrain/ssdp/issues/81)) ([8ccdc7f](https://github.com/achingbrain/ssdp/commit/8ccdc7f91efd55e26a7b5f7295052c3a201bf0e7))
+
 ## [4.2.0](https://github.com/achingbrain/ssdp/compare/v4.1.3...v4.2.0) (2024-11-29)
 
 ### Features
