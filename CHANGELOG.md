@@ -1,3 +1,10 @@
+## [4.2.0](https://github.com/achingbrain/ssdp/compare/v4.1.3...v4.2.0) (2024-11-29)
+
+### Features
+
+* allow rebroadcasting search ([#80](https://github.com/achingbrain/ssdp/issues/80)) ([b3851ca](https://github.com/achingbrain/ssdp/commit/b3851ca76f46050da8d68020edcc8e3538399dc3))
+* allow skipping cache entries ([#79](https://github.com/achingbrain/ssdp/issues/79)) ([9b2bb49](https://github.com/achingbrain/ssdp/commit/9b2bb49451c6235c587c6d01af8cae095f66e2fd))
+
 ## [4.1.3](https://github.com/achingbrain/ssdp/compare/v4.1.2...v4.1.3) (2024-11-27)
 
 ### Dependencies
