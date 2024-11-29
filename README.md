@@ -35,13 +35,13 @@ bus.on('error', console.error)
 
 ## Example - Find a service
 
-Pass a `usn` to the `discover` method - when services are found events will be emitted:
+Pass a `serviceType` to the `discover` method - when services are found events will be emitted:
 
 ```javascript
 // this is the unique service name we are interested in:
-const usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
+const serviceType = 'urn:schemas-upnp-org:service:ContentDirectory:1'
 
-for await (const service of bus.discover(usn)) {
+for await (const service of bus.discover({ serviceType })) {
   // search for instances of a specific service
 }
 
@@ -184,10 +184,10 @@ var bus = ssdp({
 bus.on('error', console.error)
 
 // this is the type of service we are interested in
-var usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
+var serviceType = 'urn:schemas-upnp-org:service:ContentDirectory:1'
 
 // search for one type of service
-for await (const service of bus.discover(usn)) {
+for await (const service of bus.discover({ serviceType })) {
 
 }
 

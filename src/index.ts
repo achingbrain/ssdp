@@ -14,13 +14,13 @@
  *
  * @example Find a service
  *
- * Pass a `usn` to the `discover` method - when services are found events will be emitted:
+ * Pass a `serviceType` to the `discover` method - when services are found events will be emitted:
  *
  * ```javascript
  * // this is the unique service name we are interested in:
- * const usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
+ * const serviceType = 'urn:schemas-upnp-org:service:ContentDirectory:1'
  *
- * for await (const service of bus.discover(usn)) {
+ * for await (const service of bus.discover({ serviceType })) {
  *   // search for instances of a specific service
  * }
  *
@@ -163,10 +163,10 @@
  * bus.on('error', console.error)
  *
  * // this is the type of service we are interested in
- * var usn = 'urn:schemas-upnp-org:service:ContentDirectory:1'
+ * var serviceType = 'urn:schemas-upnp-org:service:ContentDirectory:1'
  *
  * // search for one type of service
- * for await (const service of bus.discover(usn)) {
+ * for await (const service of bus.discover({ serviceType })) {
  *
  * }
  *
@@ -357,10 +357,42 @@ export interface SSDPSocketOptions {
 }
 
 export interface SSDPOptions {
+  /**
+   * The unique device name for the device advertised by this instance.
+   *
+   * Not required if nothing is being advertised.
+   *
+   * @default undefined
+   */
   udn: string
+
+  /**
+   * The human-readable description of the device advertised by this instance.
+   *
+   * Not required if nothing is being advertised.
+   *
+   * @default undefined
+   */
   signature: string
+
+  /**
+   * The UDP sockets to listen on/broadcast to
+   */
   sockets: SSDPSocketOptions[]
+
+  /**
+   * Whether or not to create ports and set up event listeners
+   *
+   * @default true
+   */
   start: boolean
+
+  /**
+   * Whether to cache discovered services using their Unique Device Names.
+   *
+   * @default true
+   */
+  cache: boolean
 }
 
 export interface SSDPSocket extends Socket {
@@ -481,7 +513,7 @@ export interface SSDP {
   discover<Details = Record<string, any>>(options?: DiscoverOptions): AsyncGenerator<Service<Details>>
 
   /**
-   * @deprecated Pass`DiscoverOptions` instead
+   * @deprecated Pass `DiscoverOptions` instead
    */
   discover<Details = Record<string, any>>(serviceType?: string): AsyncIterable<Service<Details>>
 

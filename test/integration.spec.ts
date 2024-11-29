@@ -96,6 +96,42 @@ describe('ssdp', () => {
     expect(service.details.foo).to.equal('bar')
   })
 
+  it('should discover a service multiple times when not caching', async () => {
+    const deferred = defer<Service<Record<string, any>>>()
+
+    await bus.stop()
+
+    bus = await ssdp({
+      cache: false
+    })
+
+    let count = 0
+
+    bus.on('service:discover', service => {
+      count++
+
+      if (count === 2) {
+        deferred.resolve(service)
+      }
+    })
+
+    const message = 'NOTIFY * HTTP/1.1\r\n' +
+      'HOST: 239.255.255.250:1900\r\n' +
+      'NT: urn:schemas-upnp-org:device:Basic:1\r\n' +
+      'NTS: ssdp:alive\r\n' +
+      'USN: uuid:2f402f80-da50-11e1-9b23-00178809ea66\r\n' +
+      'CACHE-CONTROL: max-age=1800\r\n' +
+      'SERVER: node.js/0.12.6 UPnP/1.1 @achingbrain/ssdp/0.0.1\r\n' +
+      'LOCATION: ' + detailsLocation
+
+    bus.emit('transport:incoming-message', Buffer.from(message), { address: 'test', port: 0 })
+    bus.emit('transport:incoming-message', Buffer.from(message), { address: 'test', port: 0 })
+
+    const service = await deferred.promise
+    expect(service).to.have.property('serviceType', 'urn:schemas-upnp-org:device:Basic:1')
+    expect(service.details.foo).to.equal('bar')
+  })
+
   it('should update a service', async () => {
     const deferred = defer<{
       discoveredService: Service<Record<string, any>>

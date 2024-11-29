@@ -17,6 +17,7 @@ export function defaultSsdpOptions (options?: Partial<SSDPOptions>): SSDPOptions
     retry: {
       times: 5,
       interval: 5000
-    }
+    },
+    cache: true
   }, options)
 }
