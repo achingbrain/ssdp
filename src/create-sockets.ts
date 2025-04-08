@@ -29,9 +29,9 @@ export async function createSockets (ssdp: SSDP, signal: AbortSignal): Promise<S
             sockets.push(socket as SSDPSocket)
 
             resolve()
-          } catch (error: any) {
-            error.message = `Adding membership ${options.broadcast.address} failed - ${error.message}` // eslint-disable-line @typescript-eslint/restrict-template-expressions
-            reject(error as Error)
+          } catch (err: any) {
+            log.error('adding membership %s failed - %e', options.broadcast.address, err)
+            reject(err as Error)
           }
         })
       })
