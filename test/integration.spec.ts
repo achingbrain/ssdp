@@ -325,7 +325,8 @@ describe('ssdp', () => {
 
     const message = await deferred.promise
     expect(message).to.contain('ST: ' + usn)
-    expect(message).to.contain('MAN: ssdp:discover')
+    expect(message).to.contain('MAN: "ssdp:discover"')
+    expect(message).to.contain('MX: 1')
   })
 
   it('should search for all services', async () => {
@@ -343,7 +344,8 @@ describe('ssdp', () => {
 
     const message = await deferred.promise
     expect(message).to.contain('ST: ssdp:all')
-    expect(message).to.contain('MAN: ssdp:discover')
+    expect(message).to.contain('MAN: "ssdp:discover"')
+    expect(message).to.contain('MX: 1')
   })
 
   it('should handle search responses', async () => {
