@@ -1,3 +1,13 @@
+## [4.2.2](https://github.com/achingbrain/ssdp/compare/v4.2.1...v4.2.2) (2025-04-08)
+
+### Bug Fixes
+
+* SSDP discovery according to spec ([#83](https://github.com/achingbrain/ssdp/issues/83)) ([6753255](https://github.com/achingbrain/ssdp/commit/675325563044ab3cf64328c0161232712166245f))
+
+### Dependencies
+
+* **dev:** bump sinon from 19.0.5 to 20.0.0 ([#82](https://github.com/achingbrain/ssdp/issues/82)) ([aac60c1](https://github.com/achingbrain/ssdp/commit/aac60c1ed2fcade5dc2614b5ec6fa9934778c3a1))
+
 ## [4.2.1](https://github.com/achingbrain/ssdp/compare/v4.2.0...v4.2.1) (2024-11-29)
 
 ### Bug Fixes
