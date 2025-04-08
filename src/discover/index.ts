@@ -5,7 +5,7 @@ export function discover (ssdp: SSDP, serviceType?: string): void {
 
   ssdp.emit('ssdp:send-message', 'M-SEARCH * HTTP/1.1', {
     ST: serviceType,
-    MAN: 'ssdp:discover',
-    MX: 0
+    MAN: '"ssdp:discover"',
+    MX: 1
   })
 }
