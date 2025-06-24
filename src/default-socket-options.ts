@@ -10,6 +10,7 @@ export function defaultSocketOptions (options?: Partial<SSDPSocketOptions>): SSD
       port: 1900
     },
     bind: {
+      address: options?.type === 'udp6' ? '::' : '0.0.0.0',
       port: 1900
     },
     maxHops: 4
