@@ -1,3 +1,13 @@
+## [4.2.4](https://github.com/achingbrain/ssdp/compare/v4.2.3...v4.2.4) (2025-06-24)
+
+### Bug Fixes
+
+* make options optional and deep merge options ([#99](https://github.com/achingbrain/ssdp/issues/99)) ([d78187d](https://github.com/achingbrain/ssdp/commit/d78187d977672067d252fd0969031767b55ae943))
+
+### Trivial Changes
+
+* remove vscode dir ([30462d2](https://github.com/achingbrain/ssdp/commit/30462d21ba080febd828e587fe22bfbf61ea99c7))
+
 ## [4.2.3](https://github.com/achingbrain/ssdp/compare/v4.2.2...v4.2.3) (2025-06-24)
 
 ### Trivial Changes
