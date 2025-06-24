@@ -326,17 +326,7 @@
  * - [Xedecimal/node-ssdp](https://www.npmjs.com/package/ssdp) (no longer maintained)
  */
 
-import { EventEmitter, on } from 'node:events'
-import { advertise } from './advertise/index.js'
-import { adverts } from './adverts.js'
-import { notify } from './commands/notify.js'
-import { search } from './commands/search.js'
-import { createSockets } from './create-sockets.js'
-import { defaultSsdpOptions } from './default-ssdp-options.js'
-import { discover } from './discover/index.js'
-import { searchResponse } from './discover/search-response.js'
-import { parseSsdpMessage } from './parse-ssdp-message.js'
-import { sendSsdpMessage } from './send-ssdp-message.js'
+import { SSDP as SSDPImpl } from './ssdp.js'
 import type { CachedAdvert } from './adverts.js'
 import type { AbortOptions } from 'abort-error'
 import type { Socket } from 'dgram'
@@ -350,10 +340,10 @@ export interface NetworkAddress {
 }
 
 export interface SSDPSocketOptions {
-  type: 'udp4' | 'udp6'
-  broadcast: NetworkAddress
-  bind: NetworkAddress
-  maxHops: number
+  type?: 'udp4' | 'udp6'
+  broadcast?: NetworkAddress
+  bind?: NetworkAddress
+  maxHops?: number
 }
 
 export interface SSDPOptions {
@@ -364,7 +354,7 @@ export interface SSDPOptions {
    *
    * @default undefined
    */
-  udn: string
+  udn?: string
 
   /**
    * The human-readable description of the device advertised by this instance.
@@ -373,26 +363,26 @@ export interface SSDPOptions {
    *
    * @default undefined
    */
-  signature: string
+  signature?: string
 
   /**
    * The UDP sockets to listen on/broadcast to
    */
-  sockets: SSDPSocketOptions[]
+  sockets?: SSDPSocketOptions[]
 
   /**
    * Whether or not to create ports and set up event listeners
    *
    * @default true
    */
-  start: boolean
+  start?: boolean
 
   /**
    * Whether to cache discovered services using their Unique Device Names.
    *
    * @default true
    */
-  cache: boolean
+  cache?: boolean
 }
 
 export interface SSDPSocket extends Socket {
@@ -540,78 +530,6 @@ export interface SSDP {
   emit<U extends keyof SSDPEvents>(
     event: U, ...args: Parameters<SSDPEvents[U]>
   ): boolean
-}
-
-class SSDPImpl extends EventEmitter implements SSDP {
-  public udn: string
-  public signature: string
-  public sockets: SSDPSocket[]
-  public readonly options: SSDPOptions
-  private readonly abortController: AbortController
-
-  constructor (options?: Partial<SSDPOptions>) {
-    super()
-
-    this.options = defaultSsdpOptions(options)
-    this.udn = this.options.udn
-    this.signature = this.options.signature
-    this.sockets = []
-    this.abortController = new AbortController()
-  }
-
-  async start (): Promise<void> {
-    // set up UDP sockets listening for SSDP broadcasts
-    this.sockets = await createSockets(this, this.abortController.signal)
-
-    // set up protocol listeners
-    this.on('transport:incoming-message', parseSsdpMessage.bind(null, this))
-    this.on('ssdp:send-message', sendSsdpMessage.bind(null, this))
-    this.on('ssdp:m-search', search.bind(null, this))
-    this.on('ssdp:notify', notify.bind(null, this))
-    this.on('ssdp:search-response', searchResponse.bind(null, this))
-  }
-
-  async stop (): Promise<void> {
-    await adverts.stopAll()
-
-    await Promise.all(
-      this.sockets.map(async socket => {
-        await new Promise<void>(resolve => {
-          socket.on('close', () => { resolve() })
-          socket.close()
-          socket.closed = true
-        })
-      })
-    )
-
-    this.abortController.abort()
-  }
-
-  async advertise (advert: Advertisement): Promise<CachedAdvert> {
-    return advertise(this, advert)
-  }
-
-  async * discover <Details = Record<string, any>> (serviceType?: string | DiscoverOptions): AsyncGenerator<Service<Details>, void, any> {
-    const opts: DiscoverOptions | undefined = typeof serviceType === 'string' ? { serviceType } : serviceType
-
-    discover(this, opts?.serviceType)
-
-    let interval: ReturnType<typeof globalThis.setInterval> | undefined
-
-    if (opts?.searchInterval != null) {
-      interval = setInterval(() => {
-        discover(this, opts?.serviceType)
-      }, opts.searchInterval)
-    }
-
-    try {
-      for await (const [service] of on(this, 'service:discover', opts)) {
-        yield service
-      }
-    } finally {
-      clearInterval(interval)
-    }
-  }
 }
 
 export default async function (options: Partial<SSDPOptions> = {}): Promise<SSDP> {
