@@ -1,3 +1,14 @@
+## [4.2.3](https://github.com/achingbrain/ssdp/compare/v4.2.2...v4.2.3) (2025-06-24)
+
+### Trivial Changes
+
+* fix doc generation ([4f84b14](https://github.com/achingbrain/ssdp/commit/4f84b14eae65f6be99deaeb192739c5a3ca66fb3))
+
+### Dependencies
+
+* **dev:** bump aegir from 45.1.4 to 47.0.17 ([#98](https://github.com/achingbrain/ssdp/issues/98)) ([f0ff093](https://github.com/achingbrain/ssdp/commit/f0ff09351ad67b8fc4294b21d8a8db31372ed013))
+* **dev:** bump sinon from 20.0.0 to 21.0.0 ([#97](https://github.com/achingbrain/ssdp/issues/97)) ([1b93ed7](https://github.com/achingbrain/ssdp/commit/1b93ed7c83c70e835f546fb4c6467ad4179bd236))
+
 ## [4.2.2](https://github.com/achingbrain/ssdp/compare/v4.2.1...v4.2.2) (2025-04-08)
 
 ### Bug Fixes
