@@ -532,7 +532,7 @@ export interface SSDP {
   ): boolean
 }
 
-export default async function (options: Partial<SSDPOptions> = {}): Promise<SSDP> {
+export default async function (options: SSDPOptions = {}): Promise<SSDP> {
   const ssdp = new SSDPImpl(options)
 
   if (options.start !== false) {

@@ -25,7 +25,7 @@ export class SSDP extends EventEmitter implements SSDPInterface {
   public readonly options: SSDPOptions
   private readonly abortController: AbortController
 
-  constructor (options?: Partial<SSDPOptions>) {
+  constructor (options?: SSDPOptions) {
     super()
 
     this.options = defaultSsdpOptions(options)

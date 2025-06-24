@@ -2,7 +2,7 @@
 import mergeOptions from 'merge-options'
 import type { SSDPSocketOptions } from './index.js'
 
-export function defaultSocketOptions (options?: Partial<SSDPSocketOptions>): SSDPSocketOptions {
+export function defaultSocketOptions (options?: SSDPSocketOptions): SSDPSocketOptions {
   return mergeOptions({
     type: 'udp4', // or 'udp6'
     broadcast: {
