@@ -7,7 +7,8 @@ import sinon from 'sinon'
 import xml2js from 'xml2js'
 import { adverts } from '../src/adverts.js'
 import { cache } from '../src/cache.js'
-import ssdp, { type NetworkAddress, type Service, type SSDP, type SSDPSocket } from '../src/index.js'
+import ssdp from '../src/index.js'
+import type { NetworkAddress, Service, SSDP, SSDPSocket } from '../src/index.js'
 
 describe('ssdp', () => {
   let bus: SSDP

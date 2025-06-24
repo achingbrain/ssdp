@@ -1,3 +1,4 @@
+// @ts-expect-error https://github.com/schnittstabil/merge-options/pull/28
 import mergeOptions from 'merge-options'
 import type { SSDPSocketOptions } from './index.js'
 
