@@ -1,3 +1,4 @@
+// @ts-expect-error https://github.com/schnittstabil/merge-options/pull/28
 import mergeOptions from 'merge-options'
 import xml2js from 'xml2js'
 import type { Advert } from './index.js'
@@ -52,7 +53,7 @@ export function parseAdvertOptions (ssdp: SSDP, options: Advertisement): Advert 
         const builder = new xml2js.Builder()
         resolve(builder.buildObject(details))
       } catch (error: any) {
-        reject(error as Error)
+        reject(error)
       }
     })
   }

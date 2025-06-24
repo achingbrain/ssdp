@@ -1,8 +1,9 @@
-import { adverts, type CachedAdvert } from '../adverts.js'
+import { adverts } from '../adverts.js'
 import { BYEBYE, ALIVE } from '../commands/notify.js'
 import { broadcastAdvert } from './broadcast-advert.js'
 import { createLocation } from './create-location.js'
 import { parseAdvertOptions } from './parse-options.js'
+import type { CachedAdvert } from '../adverts.js'
 import type { Advertisement, SSDP } from '../index.js'
 
 export interface Advert {
