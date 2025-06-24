@@ -25,14 +25,14 @@ export function sendSsdpMessage (ssdp: SSDP, status: string, headers: Record<str
 
         if (!status.startsWith('HTTP/1.1')) {
           // not a response so insert the host header
-          let host = socket.options.broadcast.address
+          let host = socket.options.broadcast?.address
 
           if (socket.type === 'udp6') {
             // need to wrap IPv6 addrs in `[...]` because they can contain `:`
-            host = `[${socket.options.broadcast.address}]`
+            host = `[${socket.options.broadcast?.address}]`
           }
 
-          message.push(`HOST: ${host}:${socket.options.broadcast.port}`)
+          message.push(`HOST: ${host}:${socket.options.broadcast?.port}`)
         }
 
         Object.keys(headers).forEach(function (header) {

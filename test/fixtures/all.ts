@@ -20,5 +20,3 @@ export async function all (): Promise<void> {
     console.info(JSON.stringify(service.details, null, 2))
   }
 }
-
-// void all()
