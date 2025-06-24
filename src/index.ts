@@ -61,7 +61,7 @@
  * await advert.stop()
  * ```
  *
- * For full options, see [lib/advertise/parse-options.js](lib/advertise/parse-options.js)
+ * For full options, see the [Advertisement](https://achingbrain.github.io/ssdp/interfaces/Advertisement.html) interface.
  *
  * ## Integrate with existing HTTP servers
  *
@@ -314,7 +314,7 @@
  * })
  * ```
  *
- * Alternatively see [test/fixtures/all.js](test/fixtures/all.js)
+ * Alternatively see [test/fixtures/all.ts](https://github.com/achingbrain/ssdp/blob/main/test/fixtures/all.ts)
  *
  * ## References
  *

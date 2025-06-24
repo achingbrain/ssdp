@@ -2,5 +2,11 @@
   "readme": "none",
   "entryPoints": [
     "./src/index.ts"
+  ],
+  "highlightLanguages": [
+    "javascript",
+    "proto",
+    "typescript",
+    "xml"
   ]
 }
